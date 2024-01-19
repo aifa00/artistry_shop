@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>                                              
+
+        <main class="main">
+    
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>                    
+                        <li class="breadcrumb-item active" aria-current="page">Wallet</li>
+                    </ol>
+                </div>
+            </nav>
+                    
+            <div class="page-content">
+            	<div class="cart">
+	                <div class="container" style="display: grid;grid-template-rows: auto;">
+                        <h5>MY WALLET</h5>
+	                	<div class="row">
+                            
+	                		<div class="col-lg-12">
+	                			
+                                <span class="d-block h6 text-uppercase">
+                                    Balance: <strong>₹<%= currentUser.wallet.balance.toFixed() %></strong>
+                                </span>
+
+                                  <strong class="d-block text-primary mt-4 text-uppercase">Transaction History</strong>
+
+                                  <% if (!currentUser.wallet.transactions.length) { %>
+
+                                  <p class="mb-0">No data found.</p>
+
+                                  <% } else { %>
+
+                                    <table class="table">                                       
+                                        <tbody>`                                                                                       
+                                            <% for (let i = currentUser.wallet.transactions.length - 1; i >= 0; i--) { %>
+                                                <tr>
+                                                    <td class="text-dark"><%= currentUser.wallet.transactions[i].timestamp.toLocaleDateString() %></td>
+                                                    <td><%= currentUser.wallet.transactions[i].description %></td>
+                                            
+                                                    <% if (currentUser.wallet.transactions[i].type === 'Credit') { %>
+                                                        <td><strong>Credited</strong></td>
+                                                        <td class="text-success"><strong>₹<%= currentUser.wallet.transactions[i].amount.toFixed() %></strong></td>
+                                            
+                                                    <% } else { %>
+                                                        <td><strong>Debited</strong></td>
+                                                        <td class="text-dark"><strong>₹<%= currentUser.wallet.transactions[i].amount.toFixed() %></strong></td>
+                                            
+                                                    <% } %>
+                                            
+                                                </tr>
+                                            <% } %>                                            
+                                        </tbody>
+                                    </table>
+                                  <% } %>	                		
+	                		</div>	        
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+                </div><!-- End .cart -->
+            </div><!-- End .page-content -->        
+        </main>
+        <%- include('./partials/footer') -%>
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+    <%- include('./partials/mobileMenu') -%>
+   
+
+
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>    
+    <script src="/user/js/main.js"></script>
+    
+    
+</body>
+</html>

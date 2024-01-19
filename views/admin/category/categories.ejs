@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') -%>
+</head>
+
+<body>
+
+        <%- include('../partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100">
+                <div class="row g-4 p-4">
+
+                    <div class="col-12">
+                        <h5 class="mb-2 ms-2 text-dark">ALL CATEGORIES</h5>                   
+                        <div class="rounded h-100 p-4" style="background-color: #eeee;">
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="text-dark" >
+                                        <tr class="text-center" >
+                                            <th>CATEGORY</th>
+                                            <th>NAME</th>
+                                            <th>PRODUCTS</th>
+                                            <th>OFFER</th>
+                                            <th>OFF%</th>
+                                            <th>OFF VALID UPTO</th>                                        
+                                            <th>ACTION</th>                
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultant-table">
+
+                                        <% if (!categoryDatas.length) { %>
+
+                                            <tr>
+                                                <td colspan="4"><i class="bi bi-search"></i> No Categories found</td>
+                                            </tr>
+
+                                            
+                                        <% } else { %> 
+
+                                            <% categoryDatas.forEach((category)=> { %>
+                                                
+                                                <tr class="text-center" >
+                                                    <td> <img src="<%= category.image %>" alt="<%= category.name %>" class="rounded-circle" width="50px" height="50px"> </td>
+                                                    <td> <%= category.name %> </td>
+                                                    <td> <%= category.productsCount %></td>
+                                                    
+                                                    
+                                                    <td>
+                                                        <% const currentDate = new Date() %>
+                                                        <% if (category.isOfferActive && currentDate <= category.offerValidUpto) { %>                                                            
+                                                            <strong class="text-success">Active</strong> 
+                                                        <% } else { %>
+                                                            <strong class="text-danger">Inactive</strong> 
+                                                        <% } %> 
+                                                    </td>
+
+                                                    <td>                                                        
+                                                        <% if (category.isOfferActive && currentDate <= category.offerValidUpto) { %>                                                            
+                                                            <strong class="text-success"><%= category.offerPercentage %> %</strong> 
+                                                        <% } else { %>
+                                                            <% if (category.offerPercentage) { %>
+                                                                <strong class="text-danger"><%= category.offerPercentage %> %</strong> 
+                                                            <% } else { %>
+                                                                <strong class="text-danger">0 %</strong> 
+                                                            <% } %>
+                                                            
+                                                        <% } %> 
+                                                    </td>
+
+
+                                                    <td>
+                                                        <% if (category.offerValidUpto) { %>
+                                                            <strong><%= category.offerValidUpto.toLocaleDateString() %></strong> 
+                                                        <% } else { %>
+                                                            <strong>Not Found</strong> 
+                                                        <% } %> 
+                                                    </td>
+                                                    
+                                                    <td>
+                                                        <div class="d-flex justify-content-center">
+
+                                                            <a href="/admin/edit-category/<%= category._id %>" class="text-dark mt-1 me-3"><i class="bi bi-pencil-square"></i></a>
+
+                                                            <form action="/admin/categories/action/<%= category._id %>?_method=PATCH" method="post" >
+
+                                                                <% if(category.disabled===true ) { %>
+                                                                    <input type="hidden" value="" name="state" >
+                                                                    <button type="submit" class="btn btn-sm action-btn me-2" style="width: 65px;background-color: rgb(38, 141, 38); color: white;">Activate</button>
+                                                                <% } else { %>
+                                                                    <input type="hidden" value="1" name="state" >
+                                                                    <button type="submit" class="btn btn-sm btn-primary action-btn me-2">Delete</button>
+                                                                <% } %>
+                                
+                                                            </form>
+
+                                                            <form action="/admin/categories/action/offer/<%= category._id %>?_method=PATCH" method="post">
+
+                                                                <% if (category.isOfferActive && currentDate <= category.offerValidUpto) { %>
+                                                                    <input type="hidden" value="" name="state" >
+                                                                    <button type="submit" class="btn btn-sm action-btn"  style="background-color: #137fb1ee;color: white;">Diactivate Off</button>
+                                                                <% } else { %>
+                                                                    <input type="hidden" value="1" name="state">
+                                                                    <button type="submit" class="btn btn-sm action-btn px-3" style="background-color: rgb(219, 189, 0); color: white;">
+                                                                        Activate Off
+                                                                    </button>
+                                                                <% } %> 
+
+                                                                
+                                                            </form>
+
+
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    
+                                                </tr>
+
+                                            <% }) %>
+                                            
+                                        <% } %>
+                                        
+                                    </tbody>
+                                </table>                    
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- pagination -->
+                <nav aria-label="Page navigation" class="d-flex justify-content-around align-items-center mt-3">
+                                
+                    <p> page <%= currentPage %> of <%= totalPages %></p>
+                 
+                    <ul class="pagination justify-content-center align-items-center">
+                        
+    
+                        
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link page-link-prev" href="<%= currentPage === 1 ? '#' : '/admin/categories/' + (currentPage - 1) %>" aria-label="Previous" tabindex="-1" aria-disabled="<%= currentPage === 1 %>">
+                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                            </a>
+                        </li>
+                
+                        <% for (let page = 1; page <= totalPages; page++) { %>
+                            <li class="page-item <%= currentPage === page ? 'active' : '' %>" aria-current="<%= currentPage === page ? 'page' : '' %>">
+                                <a class="page-link" href="<%= '/admin/categories/' + page %>"><%= page %></a>
+                            </li>
+                        <% } %>
+                
+                        <li class="page-item-total">of <%= totalPages %></li>
+                
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link page-link-next" href="<%= currentPage === totalPages ? '#' : '/admin/categories/' + (currentPage + 1) %>" aria-label="Next">
+                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                            </a>
+                        </li>
+                       
+                    </ul>
+               
+                </nav>
+            </div>
+            <!-- Table End -->
+        
+
+            <%- include('../partials/footer') -%>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+</body>
+
+</html>

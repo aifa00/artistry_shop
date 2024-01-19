@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>                                              
+
+        <main class="main">
+    
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>                    
+                        <li class="breadcrumb-item active" aria-current="page">Coupons</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+                        
+            <div class="page-content">
+            	<div class="cart">
+	                <div class="container vh-100" style="padding: 0rem 10rem ;" >
+                        
+	                	<div class="row">
+                        <% if (!foundCoupons.length) { %>
+
+                            <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 20vh;">
+                                <H6>NO AVAILABLE COUPONS</H6>                            
+                            </div>
+                            
+                        <% } else { %> 
+                            <h5>AVAILABLE COUPONS</h5>
+                            <% foundCoupons.forEach((coupon) => { %>
+                                <div class="col-lg-12 border p-2 mt-1 mb-3">
+                                    <div style="display: flex;justify-content: space-between;" >
+                                      <div>
+                                          
+                                          <p>
+                                            <strong class="text-primary"><%= coupon.description %></strong> <br>
+                                            <strong class="text-success">
+                                                Get <%= coupon.discountType === 'percentage' ? `${coupon.discountAmount}%` : `₹ ${coupon.discountAmount}` %> off
+                                            </strong><br>
+                                            <% if (coupon.minPurchaseAmount !== 0) { %>
+                                                Get extra <%= coupon.discountType === 'percentage' ? `${coupon.discountAmount}%` : `₹ ${coupon.discountAmount}` %> off on minimum purchase of &#8377; <%= coupon.minPurchaseAmount %> <br>
+                                            <% } %>
+
+                                            <div style="display: flex; justify-content: space-between; padding: 0.3rem 1rem; border: 2px dotted #be1717; max-width: 20rem;">
+                                                <strong id="couponCode<%= coupon._id %>" class="text-dark"><%= coupon.code %></strong>
+                                                <span id="clipboardIcon<%= coupon._id %>" onclick="copyCodeToClipboard('<%= coupon._id %>')" style="cursor: pointer;">
+                                                    <i class="bi bi-clipboard"></i> Copy
+                                                </span>
+                                                <span id="checkIcon<%= coupon._id %>" style="display: none;">
+                                                    <i class="bi bi-check-lg"></i> Copied
+                                                </span>
+                                            </div>
+
+                                          </p>
+                                      </div>
+                                      <div>
+                                          <strong>Valid till <%= coupon.expirationDate.toLocaleDateString('en-US', { month:'short', day: 'numeric', year: 'numeric' }) %></strong>
+                                      </div>
+    
+                                    </div>                                                                                                                                                                                                                                       
+                                  </div>
+                            <% }) %> 
+                        <% } %>
+                        
+                        <% if (earnedCoupons.length) { %>
+                        <h5>EARNED COUPONS</h5>
+                        <% earnedCoupons.forEach((coupon) => { %>
+                            <div class="col-lg-12 border p-2 mt-1 mb-3">
+                                <div style="display: flex;justify-content: space-between;" >
+                                  <div>
+                                      
+                                      <p>
+                                        <strong ><%= coupon.coupon.description %></strong> <br>
+                                        <strong>
+                                            Get <%= coupon.coupon.discountType === 'percentage' ? `${coupon.coupon.discountAmount}%` : `$${coupon.coupon.discountAmount}` %> off
+                                        </strong> <br>
+                                        <% if (coupon.coupon.minPurchaseAmount !== 0) { %>
+                                            Get extra <%= coupon.coupon.discountType === 'percentage' ? `${coupon.coupon.discountAmount}%` : `$${coupon.coupon.discountAmount}` %> off on minimum purchase of &#8377; <%= coupon.coupon.minPurchaseAmount %> <br>
+                                        <% } %>
+                                            
+                                      </p>
+                                  </div>
+                                  <div>
+                                      <strong>Valid till <%= coupon.coupon  .expirationDate.toLocaleDateString('en-US', { month:'short', day: 'numeric', year: 'numeric' }) %></strong>
+                                  </div>
+
+                                </div>                                                                                                                                                                                                                                       
+                              </div>
+                        <% }) %> 
+
+                        <% } %>
+                        
+                                                  
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+                </div><!-- End .cart -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+   
+
+    
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>    
+    <script src="/user/js/main.js"></script>
+
+    <script>
+        function copyCodeToClipboard(couponId) {
+            var couponCodeElement = document.getElementById('couponCode' + couponId);
+            var clipboardIcon = document.getElementById('clipboardIcon' + couponId);
+            var checkIcon = document.getElementById('checkIcon' + couponId);
+    
+            var textArea = document.createElement('textarea');
+            textArea.value = couponCodeElement.innerText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+    
+            // Hide clipboard icon and show check icon
+            clipboardIcon.style.display = 'none';
+            checkIcon.style.display = 'inline';
+    
+            // After 3 seconds, revert to the previous state
+            setTimeout(function () {
+                clipboardIcon.style.display = 'inline';
+                checkIcon.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+    
+</body>
+</html>

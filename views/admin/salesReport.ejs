@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head') -%>
+</head>
+<body>
+
+        <%- include('./partials/header') -%>
+                            
+            <div class="container-fluid pt-4 px-4 vh-100">
+
+                <h5 class="mb-2 ms-4 text-dark">SALES REPORT</h5>                                                                                                    
+                
+                <div class="row g-4 p-4">
+                    
+                <div class="d-flex flex-column align-items-end">                 
+                    <form action="/admin/sales-report?filtered=true" method="post" id="filterDateForm" class="flex-wrap">
+                        <div class="d-flex">
+                            <div class="me-4">
+                                <select class="form-select" style="background-color: #eeee; border: none;" name="payment" id="payment">
+                                    <option value="">Select Payment</option>
+                                    <option value="cod" <%= payment === 'cod' ? 'selected' : '' %>>COD</option>
+                                    <option value="razorpay" <%= payment === 'razorpay' ? 'selected' : '' %>>Razorpay</option>
+                                    <option value="wallet" <%= payment === 'wallet' ? 'selected' : '' %>>Wallet</option>
+                                </select>
+                            </div>
+                
+                            <div>
+                                <div class="d-flex">
+                                    <div class="me-2">
+                                        <input class="form-control" style="background-color: #eeee; border: none;" type="date" value="<%= startDate !== null ? startDate : '' %>" name="from" id="dateFrom">
+                                        
+                                    </div>
+                                    <div class="me-2">
+                                        <input class="form-control" style="background-color: #eeee; border: none;" type="date" value="<%= endDate !== null ? endDate : '' %>" name="upto" id="dateUpto">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+                        </div>      
+                        
+                    </form>    
+                    <div class="mt-2" >
+                        <span class="text-danger" id="error"></span>
+                    </div>                    
+                </div>
+
+                
+
+                <!-- Sale & Revenue Start -->
+                <div class="container-fluid">
+                    <div class="row g-4">
+                        <div class="col-sm-12 col-xl-4">
+        
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Total Orders</p>
+                                    <h6 class="mb-0 text-dark"><%= totalOrders %></h6>
+                                </div>
+                            </div>
+        
+                        </div>
+                        <div class="col-sm-12 col-xl-4">
+        
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fas fa-box fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Products Sold</p>
+                                    <h6 class="mb-0 text-dark"><%= totalProductSold %></h6>
+                                </div>
+                            </div>
+        
+                        </div>
+                        <div class="col-sm-12 col-xl-4">
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Total Revenue</p>
+                                    <h6 class="mb-0 text-dark">&#8377; <%= totalRevenue.toFixed(2) %></h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+                <!-- Sale & Revenue End -->
+                    
+                    
+
+                    
+                    
+
+                    <div class="col-12">                        
+                        <div class="rounded h-100 p-4" style="background-color: #eeee;">                                                                                                                
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="text-dark" >
+                                        <tr class="text-center" >
+                                         
+                                            <th>USER</th>
+                                            <th>DELIVERY ADDRESS</th>
+                                            <th>OREDR DETAILS</th>
+                                            <th>ORDER DATE</th>                    
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultant-table">
+
+                                        <% if (!salesReport.length) { %>
+
+                                            <tr>
+                                                <td colspan="4"><i class="bi bi-search"></i> NO DATA FOUND</td>
+                                            </tr>
+
+                                            
+                                        <% } else { %> 
+
+                                            <% salesReport.forEach((report)=> { %>
+                                                
+                                                <tr>
+                                                    
+                                                    <td  > 
+                                                        <div class="mt-3 text-center" >
+                                                            <%= report.populatedUser.name %> <br>                                                        
+                                                            <%= report.populatedUser.phone %> <br>
+                                                            <%= report.populatedUser.email %>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="mt-1 text-center">
+                                                            <%= report.deliveryAddress.name %>, <%= report.deliveryAddress.building %> <br>
+                                                            <%= report.deliveryAddress.area %>, <%= report.deliveryAddress.city %><br>                                                                                                                                                                       
+                                                            <%= report.deliveryAddress.state %>, <%= report.deliveryAddress.pincode %><br>                                                                                                                                                                                                                     
+                                                            mob: <%= report.deliveryAddress.phone %>
+                                                        </div>
+                                                    </td>
+                                                               
+                                                    <td>
+                                                        <div class="mt-3 text-center" >
+                                                            <span class="text-primary text-uppercase"><%= report.products.populatedProduct.title %></span><br>
+                                                            Price: <%= report.products.populatedProduct.price %>, Quantity: <%= report.products.quantity %> <br>                                                                                                                         
+                                                            <span class="text-dark">Payment Method: </span><strong><%= report.paymentMethod %></strong>
+                                                            
+                                                            
+                                                        </div>
+                                                        
+                                                    </td>
+                                                                                          
+                                                    <td class="text-center" >
+                                                      <div style="margin-top: 2rem;">
+                                                        Order confirmed: <strong>"<%= report.orderDate.toLocaleDateString() %>"</strong><br>
+                                                        Delivery On: <strong>"<%= report.deliveryDate.toLocaleDateString() %>"</strong>
+                                                      </div>                                                                                                                   
+                                                    </td>    
+                                                                                                                                                                                                                                                                                                                                                                      
+                                                </tr>
+                                            <% }) %>                                            
+                                        <% } %>                                    
+                                    </tbody>
+                                </table>                                                                              
+                            </div>
+                        </div>                        
+                    </div>
+
+                
+                    <% if(salesReport.length) { %>
+                    <div class="col-lg-12 d-flex justify-content-end pe-4 nav-item dropdown">
+                        <a href="#" class="dropdown-toggle btn btn-primary btn-sm" data-bs-toggle="dropdown">
+                            <i class="bi bi-download"></i>
+                        
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end border-0 rounded-0 rounded-bottom m-0" style="background-color: #eeee;">
+                            <a href="/admin/download-report?salesReport=<%= encodeURIComponent(JSON.stringify(salesReport)) %>&&totalProductSold=<%= totalProductSold %>&&totalRevenue=<%= totalRevenue %>&&format=pdf" class="dropdown-item">pdf</a>
+                            <a href="/admin/download-report?salesReport=<%= encodeURIComponent(JSON.stringify(salesReport)) %>&&totalProductSold=<%= totalProductSold %>&&totalRevenue=<%= totalRevenue %>&&format=excel" class="dropdown-item">excel</a>                                                     
+                        </div>
+                    </div>
+                    <% } %>
+
+                </div>
+                
+                
+            </div>
+            <%- include('./partials/footer') -%>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+   
+    <script>
+        const filterDateForm = document.getElementById('filterDateForm');
+        const dateFrom = document.getElementById('dateFrom');
+        const dateUpto = document.getElementById('dateUpto');
+      
+        filterDateForm.addEventListener('submit', (event) => {
+          // set has errors false by default
+          let hasErrors = false;
+      
+          // clear previous messages
+          document.getElementById("error").innerHTML = "";
+         
+
+          let currentDate = new Date();
+          currentDate.setHours(23, 59, 59, 9999);// Set to end of the day
+
+          // Validate the date range between 2020 and current date
+          const minAllowedDate = new Date('2020-01-01');
+          const maxAllowedDate = currentDate;
+
+
+          let fromDate = new Date(dateFrom.value);
+          
+          let uptoDate = new Date(dateUpto.value);
+
+
+          if (!dateFrom.value || !dateUpto.value) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "Please provide both 'from' and 'upto' dates";
+          } else if (fromDate > uptoDate) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "'From' shouldn't be greater than 'upto' date";
+          } else if (isNaN(fromDate.getTime()) || isNaN(uptoDate.getTime())) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "Please enter valid dates.";
+          } else if (fromDate < minAllowedDate || uptoDate > maxAllowedDate) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "Please enter valid dates.";
+          }
+      
+          if (hasErrors) {
+            event.preventDefault();
+          }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#payment').change( function() {
+                $('#filterDateForm').submit();
+            } )
+        })
+        
+    </script>
+    
+      
+    
+</body>
+</html>

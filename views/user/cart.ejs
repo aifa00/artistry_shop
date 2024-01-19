@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>     
+        
+
+        <main class="main">
+    
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+                    </ol>
+                </div>
+            </nav>
+
+            <div class="page-content">
+            	<div class="cart">
+	                <div class="container">
+	                	<div class="row">
+                            <% if (!isLoggedIn) { %>
+
+                                <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 70vh;">
+                                    <img src="https://en.mer.vn/public/theme/imgs/shop/empty-cart.svg" alt="img" height="200rem" width="200rem">
+                                    <p>Your cart is empty.please <span style="font-size:x-large;" ><a href="/login">LOGIN</a></span> to continue</p>
+                                </div>
+                
+                            <% } else { %>
+                                <% if (!cartProducts.length) { %>
+                                    <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+                                        <img src="https://en.mer.vn/public/theme/imgs/shop/empty-cart.svg" alt="img" height="200rem" width="200rem">
+                                        <p>There is nothing in your cart. Let's add something</p>
+                                        <a href="/shop" class="btn btn-primary" style="color: white;" >Continue Shopping</a>
+                                    </div>
+                                <% } else { %>
+
+	                		<div class="col-lg-9">
+	                			<table class="table table-cart table-mobile">
+									<thead>
+										<tr>
+											<th>Product</th>
+											<th>Price</th>
+											<th>Quantity</th>
+											<th>Total</th>
+											<th></th>
+										</tr>
+									</thead>
+
+									<tbody>
+                                        <% cartProducts.forEach ((cartItem) => { %>
+                                            <tr>
+                                                <td class="product-col">
+                                                    <div class="product">
+                                                        <figure class="product-media">
+                                                            <a href="/product/<%= cartItem.product._id %>">
+                                                                <img src="<%= cartItem.product.images[0] %>" alt="Product image">
+                                                            </a>
+                                                        </figure>
+    
+                                                        <div class="d-flex flex-column">
+                                                            <h3 class="product-title">
+                                                                <a href="#"><%= cartItem.product.title %></a>
+                                                            </h3>
+                                                            <% if (!cartItem.product.stock) { %>
+                                                                <span class="text-danger mt-1" style="font-weight: 400;">Out of stock</span>
+                                                            <% } %>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+                                                </td>
+                                                <td>                                                    
+                                                    <div>
+                                                        <% let discountPercentage = 0; %>
+                                                        <% const currentDate = new Date() %>
+                
+                                                        <% if (cartItem.product.isOfferActive && currentDate <= cartItem.product.offerValidUpto) { %>   
+                                                            <% discountPercentage += cartItem.product.offerPercentage %>
+                                                        <% } %> 
+                
+                                                        <% if (cartItem.product.category.isOfferActive && currentDate <= cartItem.product.category.offerValidUpto) { %>   
+                                                            <% discountPercentage += cartItem.product.category.offerPercentage %>
+                                                        <% } %> 
+                
+                                                        <% if (discountPercentage > 90) { %>
+                                                            <% discountPercentage = 90 %>
+                                                        <% } %>
+                
+                
+                                                        <% let discountedPrice; %>
+                                                        <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                                            <% discountedPrice = cartItem.product.price - (discountPercentage/100) * cartItem.product.price %>  
+                                                            <h6>
+                                                                <span>&#8377; <%= discountedPrice %></span>
+                                                                <small style="text-decoration: line-through;color:#999;">&#8377; <%= cartItem.product.price %></small>
+                                                                <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                                            </h6>                                
+                                                            
+                
+                                                        <% } else { %>
+                                                            <h6>&#8377; <%= cartItem.product.price %></h6>
+                                                        <% } %> 
+                                                        
+                                                    </div>
+                                                </td>
+                                                <td class="quantity-col">
+                                                    <div class="cart-product-quantity">
+                                                        
+                                                        <div class="input-group" id="ig1" style="max-width: 120px;display: grid; grid-template-columns: 1fr 1fr 1fr;">                                                        
+                                                            
+                                                            <button class="btn btn-outline-primary" style="min-width: 0;" type="button" onclick="updateCartItem('<%= cartItem._id %>', 'decrement')">&minus;</button>
+                                                                                                                        
+                                                            <input type="text" class="text-center" style="min-width: 0; width: 5rem; outline: none; border: 1px solid rgb(189, 189, 189);" value="<%= cartItem.quantity %>" id="quantityElement_<%= cartItem._id %>" readonly>
+                                                            
+                                                            <button class="btn btn-outline-primary" style="min-width: 0;"  type="button" onclick="updateCartItem('<%= cartItem._id %>', 'increment')">&plus;</button>
+                                                            
+                                                        </div>
+                                                          
+                                                    </div>
+                                                    <span class="text-danger" id="stockError_<%= cartItem._id %>"  style="display: none;font-weight: 400;">Insufficient stock</span>
+                                                </td>
+
+                                                <td class="total-col" id="total_<%= cartItem._id %>">
+                                                    
+                                                    <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                                                                     
+                                                        &#8377; <%= (discountedPrice * cartItem.quantity).toFixed(2) %>
+            
+                                                    <% } else { %>
+                                                        &#8377; <%= (cartItem.product.price * cartItem.quantity).toFixed(2) %>
+                                                    <% } %>
+                                                    
+                                                </td>
+
+                                                <td><button type="button" onclick="openModal('<%= cartItem._id %>')" class="btn-remove"><i class="icon-close"></i></button></td>
+                                            </tr>
+                                        <% }) %>
+									</tbody>
+								</table><!-- End .table table-wishlist -->
+
+                                <!-- modal to remove from cart -->
+                                <div class="modal fade" id="modalToRemoveItem" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h6 class="modal-title" id="exampleModalLabel">REMOVE ITEM FROM CART</h6>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <P> Are you sure you want to remove this item ?</P>  
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+                                          <button type="button" class="btn btn-primary" id="removeItem" >REMOVE</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  
+	                			<div class="cart-bottom">			            			
+			            			<a href="#" class="btn btn-outline-dark-2"><span>UPDATE CART</span><i class="icon-refresh"></i></a>
+		            			</div>
+	                		</div>
+	                		<aside class="col-lg-3">
+	                			<div class="summary summary-cart">
+	                				<h3 class="summary-title">Cart Total</h3>
+
+	                				<table class="table table-summary">
+	                					<tbody>
+                                            <tr class="summary-subtotal">
+	                							<td>Total MRP:</td>
+	                							<td id="totalMrp">&#8377; <%= totalMrp.toFixed(2) %></td>
+	                						</tr>
+
+                                            <% if (offerDiscount) { %>
+                                                <tr class="summary-shipping-row">
+                                                    <td>
+                                                        <div >
+                                                            <span class="text-success" style="font-weight: 500;">Your Savings</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-success" style="font-weight: 500;" id="offerDiscount">- &#8377; <%= offerDiscount %></span>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+
+	                						<tr class="summary-subtotal">
+	                							<td><span>Subtotal:</span></td>
+	                							<td id="subTotalElement"><span>&#8377; <%= subTotal.toFixed(2) %></span></td>
+	                						</tr>
+
+	                						<tr class="summary-shipping">
+	                							<td>Shipping</td>
+	                							<td>&nbsp;</td>
+	                						</tr>
+
+                                            
+                                            <tr class="summary-shipping-row">
+	                							<td>
+													<div>
+                                                        <p>Shipping Charge</p>
+													</div>
+	                							</td>
+	                							<td>&#8377; 20.00</td>
+	                						</tr>
+
+	                						<tr class="summary-total">
+	                							<td>Total:</td>
+	                							<td id="grandTotalElement" >&#8377; <%= grandTotal.toFixed(2) %></td>
+	                						</tr>
+
+	                					</tbody>
+	                				</table>
+
+	                				<a href="/checkout" class="btn btn-outline-primary-2 btn-order btn-block " id="checkoutBtn" >PROCEED TO CHECKOUT</a>
+	                			</div>
+
+		            			<a href="/shop" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+	                		</aside>
+                                <% } %>
+                            <% } %>
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+                </div><!-- End .cart -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+
+        
+    
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/main.js"></script>
+    
+
+    <script>
+        //remove item from cart
+        let cartItemToRemove;
+
+        function openModal (cartItemId) {
+            cartItemToRemove = cartItemId;
+            $('#modalToRemoveItem').modal('show');
+        }
+
+        $('#removeItem').on('click', function() {
+            $.ajax ({
+                url : '/remove-from-cart/' + cartItemToRemove,
+                type: 'POST',
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+
+                }
+            });
+            $('#modalToRemoveItem').modal('hide')
+        });
+
+
+    //update cart
+    function updateCartItem(cartItemId, incOrDec) {
+      const data = {
+        incOrDec,
+      };
+      $.ajax({
+        url: '/update-cart/' + cartItemId,
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function(response) {
+          if (response.message === "Insufficient stock.") {
+            const stockError = document.getElementById(`stockError_${cartItemId}`);
+            stockError.style.display = 'block';
+          } else {
+            $('#total_' + cartItemId).text(' ₹ ' +response.totalPrice.toFixed(2));
+            $('#grandTotalElement').text(' ₹ ' + response.grandTotal);
+            $('#subTotalElement').text(' ₹ ' + response.subTotal);
+            $('#quantityElement_' + cartItemId).val(response.quantity);
+            $('#totalMrp').text(' ₹ ' + response.totalMrp);
+
+
+            if (response.offerDiscount !== 0) {
+                $('#offerDiscount').text('- ₹ ' + response.offerDiscount);
+            }
+
+            const stockError = document.getElementById(`stockError_${cartItemId}`);
+            if (response.insufficientStock) {
+
+                stockError.style.display = 'block'; 
+                checkoutBtn.classList.add('disabled');
+                $('#checkoutBtn').on('click', function(event) {
+                    event.preventDefault();
+                });
+
+            } else {
+
+              stockError.style.display = 'none';            
+              checkoutBtn.classList.remove('disabled');
+    
+            }
+          }
+        },
+        error: function(xhr, status, error) {
+          console.log(status);
+        }
+      });
+    }
+    </script>
+    
+</body>
+</html>

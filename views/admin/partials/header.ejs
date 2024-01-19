@@ -1,0 +1,157 @@
+<div class="container-fluid position-relative d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>                
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3" >
+            <nav class="navbar ">
+                <a href="/admin/dashboard" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary" style="font-weight: 800; font-size: 25px;letter-spacing: 1;"></i>ARTISTRY</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <i class="fa fa-user-edit fa-2x text-primary me-2"></i>
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0"></h6>
+                        <span>ADMIN</span>
+                    </div>
+                </div>
+
+                <div class="navbar-nav w-100">
+
+                    <a href="/admin/dashboard" class="nav-item nav-link " id="dashboard"><i class="fa fa-tachometer-alt me-2"></i>DASHBOARD</a>
+                    
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="orders"><i class="fas fa-shopping-cart me-2"></i>ORDERS</a>
+                        <div class="dropdown-menu bg-transparent border-0 ms-3">
+                            <a href="/admin/orders/1" class="dropdown-item">VIEW ORDERS</a>
+                            <a href="/admin/return-requests/1" class="dropdown-item">RETURN REQUESTS</a>                       
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="products"><i class="fas fa-box me-2"></i>PRODUCTS</a>
+                        <div class="dropdown-menu bg-transparent border-0 ms-3">
+                            <a href="/admin/add-product" class="dropdown-item">ADD PRODUCT</a>
+                            <a href="/admin/products/1" class="dropdown-item">VIEW PRODUCTS</a>                           
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="category"><i class="fas fa-folder me-2"></i>CATEGORY</a>
+                        <div class="dropdown-menu bg-transparent border-0  ms-3">
+                            <a href="/admin/new-category" class="dropdown-item">ADD CATEGORY</a>
+                            <a href="/admin/categories/1" class="dropdown-item">VIEW CATEGORIES</a>                           
+                        </div>
+                    </div>
+                    
+                    <a href="/admin/users/1" class="nav-item nav-link" id="users"><i class="fa fa-user me-2"></i>USERS</a>
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="coupons"><i class="fas fa-tags me-2"></i>COUPONS</a>
+                        <div class="dropdown-menu bg-transparent border-0  ms-3">
+                            <a href="/admin/coupons/1" class="dropdown-item" >VIEW COUPONS</a>
+                            <a href="/admin/add-coupon" class="dropdown-item">ADD COUPON</a>
+                        </div>
+                    </div>
+
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="banner"><i class="fas fa-flag me-2"></i>BANNER</a>
+                        <div class="dropdown-menu bg-transparent border-0  ms-3">
+                            <a href="/admin/banners/1" class="dropdown-item" >VIEW BANNERS</a>
+                            <a href="/admin/add-banner" class="dropdown-item">ADD BANNER</a>
+                        </div>
+                    </div>
+
+                    <a href="/admin/sales-report" class="nav-item nav-link" id="salesReport"><i class="fas fa-chart-bar me-2"></i>SALES REPORT</a>
+                    
+                    
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand sticky-top px-4 py-0" style="background-color: #eeee;">
+                <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>                
+                <div class="navbar-nav align-items-center ms-auto">                                        
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa fa-user me-2"></i>                            
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end border-0 rounded-0 rounded-bottom m-0" style="background-color: #eeee;">                        
+                            <form action="/admin/logout" method="post">
+                                <button class="dropdown-item" type="submit">Log Out</button>
+                            </form>                            
+                        </div>
+                    </div>                    
+                </div>                
+            </nav>
+            <!-- Navbar End -->
+
+
+<!-- alert messsage -->
+<% if (message) { %>
+    
+    <div class="alert alert-dismissible fade show alert-<%= message.type %>" id="alertMsg" role="alert"
+        style="position: fixed; top: 77px; right: 20px; max-width: 40rem; max-height: 3rem;">
+        <p><%= message.message %></p>
+    </div>
+    
+    
+<% } %>   
+
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                  const currentPage = '<%= activePage %>';
+                  if (currentPage === "Dashboard") {
+                    document.getElementById("dashboard").classList.add("active");
+                  } else if (currentPage === "Orders") {
+                    document.getElementById("orders").classList.add("active");
+                  } else if (currentPage === "Products") {
+                    document.getElementById("products").classList.add("active");
+                  } else if (currentPage === "Category") {
+                    document.getElementById("category").classList.add("active");
+                  } else if (currentPage === "Users") {
+                    document.getElementById("users").classList.add("active");
+                  } else if (currentPage === "Coupons") {
+                    document.getElementById("coupons").classList.add("active");
+                  } else if (currentPage === "SalesReport") {
+                    document.getElementById("salesReport").classList.add("active");
+                  } else if (currentPage === "Banner") {
+                    document.getElementById("banner").classList.add("active");
+                  }
+                  else if (currentPage === "Ordes") {
+                    document.getElementById("orders").classList.add("active");
+                  }
+                });
+
+
+
+    // Add a script to hide the alert after 3 seconds
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            var alertMsg = document.getElementById("alertMsg");
+            alertMsg.classList.remove("show");
+            alertMsg.classList.add("fade");
+            alertMsg.style.opacity = 0;
+            setTimeout(function () {
+                alertMsg.style.display = "none";
+            }, 500); // assuming the fade transition duration is 0.5 seconds
+        }, 3500); // 3500 milliseconds = 3.5 seconds
+    });
+    </script>

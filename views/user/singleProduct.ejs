@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/product.html  22 Nov 2019 09:54:50 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>       
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>
+        
+        <main class="main" style="background-color: #eeee;">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+                <div class="container d-flex align-items-center">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Product</li>
+                    </ol>
+
+                    <nav class="product-pager ml-auto" aria-label="Product">
+                        <a class="product-pager-link product-pager-prev" href="/shop" aria-label="Previous" tabindex="-1">
+                            <i class="icon-angle-left"></i>
+                            <span>Prev</span>
+                        </a>
+
+                        <a class="product-pager-link product-pager-next" href="/cart" aria-label="Next" tabindex="-1">
+                            <span>Next</span>
+                            <i class="icon-angle-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </nav>
+
+            <div class="page-content">
+                <div class="container">
+                    <div class="product-details-top">
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="product-gallery product-gallery-vertical">
+                                    <div class="row">
+                                        <figure class="product-main-image">
+                                            <img id="product-zoom" src="<%= foundProduct.images[0]  %>" data-zoom-image="<%= foundProduct.images[0] %>" alt="product image">
+
+                                            <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+                                                <i class="icon-arrows"></i>
+                                            </a>
+                                        </figure>
+
+                                        <div id="product-zoom-gallery" class="product-image-gallery" >
+                                            <% foundProduct.images.forEach(image => { %>
+                                                <a class="product-gallery-item active" href="#" data-image="<%= image %>" data-zoom-image="<%= image %>">
+                                                    <img src="<%= image %>" alt="product side">
+                                                </a>
+                                            <% }) %>
+                                            <a class="product-gallery-item active" href="#" data-image="<%= foundProduct.images[0] %>" data-zoom-image="<%= foundProduct.images[0] %>">
+                                                <img src="<%= foundProduct.images[0] %>" alt="product side">
+                                            </a>                                            
+                                        </div><!-- End .product-image-gallery -->
+                                    </div><!-- End .row -->
+                                </div><!-- End .product-gallery -->
+                            </div><!-- End .col-md-6 -->
+
+                            <div class="col-md-6">
+                                <div class="product-details mt-2">
+                                    <h1 class="product-title"><%= foundProduct.title %></h1>
+
+                                    <div class="product-price">
+                                        <% let discountPercentage = 0; %>
+                                        <% const currentDate = new Date() %>
+
+                                        <% if (foundProduct.isOfferActive && currentDate <= foundProduct.offerValidUpto) { %>   
+                                            <% discountPercentage += foundProduct.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (foundProduct.category.isOfferActive && currentDate <= foundProduct.category.offerValidUpto) { %>   
+                                            <% discountPercentage += foundProduct.category.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (discountPercentage > 90) { %>
+                                            <% discountPercentage = 90 %>
+                                        <% } %>
+
+
+                                        <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                            <% const discountedPrice = foundProduct.price - (discountPercentage/100) * foundProduct.price %>  
+                                            <h4>
+                                                <span>&#8377; <%= discountedPrice %></span>
+                                                <small style="text-decoration: line-through;color:#999;">&#8377; <%= foundProduct.price %></small>
+                                                <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                            </h4>                                
+                                            
+
+                                        <% } else { %>
+                                            <span>&#8377; <%= foundProduct.price %></span>
+                                        <% } %> 
+                                        
+                                    </div>
+
+                                    <div class="product-content">
+                                        <p>Artist:  <%= foundProduct.artist %> </p>
+                                    </div>
+
+                                    <div class="details-filter-row details-row-size">
+                                        <label>Color:<%= foundProduct.color  %></label>
+                                    </div>
+
+                                    <div class="details-filter-row details-row-size">
+                                        <label>Stock:<%= foundProduct.stock  %></label>
+                                    </div>
+                                                                         
+                                </div>
+
+                                <form class="addToCartForm" action="/add-to-cart" method="post">
+                                    <div class="details-filter-row details-row-size">
+                                        <label for="qty">Qty:</label>
+                                        <div class="product-details-quantity">
+                                            <input type="number" name="fixedQuantity"  id="qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="product-details-action">
+                                        <% if(!foundProduct.stock) { %>
+                                        <div class="details-action-wrapper mt-1">
+                                            <h5 class="text-danger">Currently Unavailable</h5>
+                                        </div>
+                                        <% } else { %>
+
+                                            <% if (isLoggedIn) { %>
+                                                <% if (currentUser && currentUser.cart.some((item) => item.product.toString() === foundProduct._id.toString()) ) { %>
+                                                    <a href="/cart" class="btn-product btn-cart">GO TO CART</a>
+                                                    
+                                                <% } else { %>
+                                                                                                       
+                                                        <input type="hidden" name="product" value="<%= foundProduct._id %>">
+                                                        
+                                                        <button type="submit" class="btn btn-product btn-cart">
+                                                          ADD TO CART
+                                                        </button>
+                                                      
+                                                <% } %>
+                                            <% } else { %>
+                                                <a href="/login" class="btn btn-product btn-cart">ADD TO CART</a>
+                                            <% } %>
+                                                                                        
+                                        <% } %>
+                                    </form>
+                                        
+                                    </div>
+
+                                    <div class="product-details-footer">
+                                        <div class="product-cat">
+                                            <p>Category: <%= foundProduct.category.name %></p>
+
+                                        </div>
+                                        
+                                    </div><!-- End .product-details-footer -->
+                                </div><!-- End .product-details -->
+                            </div><!-- End .col-md-6 -->
+                        </div><!-- End .row -->
+                    </div><!-- End .product-details-top -->
+
+                    <div class="product-details-tab">
+                        <ul class="nav nav-pills justify-content-center" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">Description</a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
+                                <div class="product-desc-content">
+                                    
+                                    <h3><%= foundProduct.description %></h3>                                    
+                                    
+                                </div><!-- End .product-desc-content -->
+                            </div><!-- .End .tab-pane -->
+                            
+                        </div><!-- End .tab-content -->
+                    </div><!-- End .product-details-tab -->                    
+                </div><!-- End .container -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+        <%- include('./partials/footer') -%>
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+   
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+    <%- include('./partials/mobileMenu') -%>
+    
+
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/jquery.elevateZoom.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/jquery.magnific-popup.min.js"></script>
+    <script src="/user/js/main.js"></script>
+
+    <script>
+   
+    $(document).ready(function() {
+        // Handle the form submission with AJAX
+        $('.addToCartForm').submit(function(event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Collect form data
+            var formData = $(this).serialize();
+            console.log(formData);
+
+            // Make an AJAX request
+            $.ajax({
+                url: '/add-to-cart',
+                type: 'POST',
+                dataType: 'json',
+                data: formData,
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+    </script>
+    
+</body>
+</html>

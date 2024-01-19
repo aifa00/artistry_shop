@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') -%>
+</head>
+
+<body>
+
+        <%- include('../partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100" style="max-width:80%;">
+                <div class="row g-4 p-4">
+
+                    <form  id="addCouponForm" action="/admin/add-coupon" method="post">
+                        <h4 class="text-dark">ADD COUPON</h4>
+
+                        <div class="form-group col-md-8 mt-3 px-1">
+                            <label for="description">Description</label>
+                            <input type="text" class="form-control" id="description" style="background: transparent;" name="description">
+                            <span id="descriptionError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div>
+
+                        <div class="d-flex" >                            
+                            <div class="form-group col-md-4 my-3">
+                                <label for="minPurchaseAmount">Minimum Purchase Amount</label>
+                                <input type="text" class="form-control" id="minPurchaseAmount" style="background: transparent;" name="minPurchaseAmount">
+                                <span id="minPurchaseAmountError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                            </div>
+                            <div class="form-group col-md-4 my-3 px-1">
+                                <label for="usageLimit">Usage Limit</label>
+                                <input type="text" class="form-control" id="usageLimit" style="background: transparent;" name="usageLimit">
+                                <span id="usageLimitError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group col-md-8">
+                          <label for="startDate">Start Date</label>
+                          <input type="date" class="form-control" id="startDate" style="background: transparent;" name="startDate">
+                          <span id="startDateError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div> 
+                        <div class="form-group col-md-8">
+                            <label for="expiryDate">Expiry Date</label>
+                            <input type="date" class="form-control" id="expiryDate" style="background: transparent;" name="expiryDate">
+                            <span id="expiryDateError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div>
+                                                                            
+                        <div class="d-flex mt-3">
+                                                            
+                            <div class="form-group my-1 col-md-4">
+                                <label for="discountType">Discount Type</label>
+                                
+                                <select class="form-control" id="discountType" style="background: transparent;" name="discountType"  >
+                                  <option value="" selected>select discount type</option>
+                                  <option value="percentage">Percentage</option>
+                                  <option value="fixedAmount">Fixed Amount</option>                                                                 
+                                </select>
+                                <span class="text-primary" id="discountTypeError" style="font-weight: 700;font-size: 13px;"></span>
+                            </div>
+
+                            <div class="form-group my-1 col-md-4 px-1 ">
+                                <label for="discountAmount">Discount Amount</label>
+                                <input type="text" class="form-control" id="discountAmount" style="background: transparent;" name="discountAmount">
+                                <span class="text-primary" id="discountAmountError" style="font-weight: 700;font-size: 13px;" ></span>
+                            </div>
+                        
+                        </div>
+
+                        <div class="form-group mb-1">
+                            <span id="error" class="text-primary" ><%= error %></span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary px-5 mt-2"> ADD COUPON </button>
+                    </form>
+                      
+                </div>
+            </div>
+        
+
+            <%- include('../partials/footer') -%>
+
+
+        </div>  
+        <!-- Content End -->
+
+
+        
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+
+    <script>
+        const addCouponForm = document.getElementById('addCouponForm');
+        const description = document.getElementById('description');
+        const minPurchaseAmount = document.getElementById('minPurchaseAmount');
+        const usageLimit = document.getElementById('usageLimit');
+        const discountType = document.getElementById('discountType');
+        const discountAmount = document.getElementById('discountAmount');
+        const expiryDate = document.getElementById('expiryDate');
+        
+        addCouponForm.addEventListener('submit', (event) => {
+        
+          // set has errors false by default
+          let hasErrors = false;
+        
+          // clear previous messages
+          document.getElementById("error").innerHTML = "";
+          document.getElementById("descriptionError").innerHTML = "";
+          document.getElementById("minPurchaseAmountError").innerHTML = "";
+          document.getElementById("usageLimitError").innerHTML = "";
+          document.getElementById("discountTypeError").innerHTML = "";
+          document.getElementById("discountAmountError").innerHTML = "";
+          document.getElementById("expiryDateError").innerHTML = "";
+        
+        
+            if (!description.value) {
+              hasErrors = true;
+              document.getElementById('descriptionError').innerHTML = "This field is required"
+            } else if (description.value.length < 5 || description.value.length > 100){
+              hasErrors = true;
+              document.getElementById('descriptionError').innerHTML = "Description should be between five to hundred cahracters";
+            }
+        
+            if (!minPurchaseAmount.value) {
+              hasErrors = true;
+              document.getElementById("minPurchaseAmountError").innerHTML = "This field is required";
+            }else if (!minPurchaseAmount.value.match(/^\d+$/)) {
+              hasErrors = true;
+              document.getElementById("minPurchaseAmountError").innerHTML = "Please enter a valid amount";
+            }
+            
+            if(!usageLimit.value) {
+              hasErrors = true;
+              document.getElementById("usageLimitError").innerHTML = "This field is required";
+            } else if (!usageLimit.value.match(/^\d+$/) || parseInt(usageLimit.value) <= 0) {
+              hasErrors = true;
+              document.getElementById("usageLimitError").innerHTML = "Please enter a valid usage limit";
+            }
+
+            const currentDate = new Date();
+            
+            const enteredStartDate = new Date(startDate.value);
+            if(!startDate.value) {
+              hasErrors = true;
+              document.getElementById("startDateError").innerHTML = "This field is required";
+            } else if (!startDate.value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              hasErrors = true;
+              document.getElementById("startDateError").innerHTML = "Please enter a valid date";
+            } else if (!enteredStartDate >= currentDate) {
+              hasErrors = true;
+              document.getElementById("startDateError").innerHTML = "Start date shouldn't be less than current date";
+            }
+
+            // const currentDate = new Date();
+            const enteredDate = new Date(expiryDate.value);
+            if(!expiryDate.value) {
+              hasErrors = true;
+              document.getElementById("expiryDateError").innerHTML = "This field is required";
+            } else if (!expiryDate.value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              hasErrors = true;
+              document.getElementById("expiryDateError").innerHTML = "Please enter a valid date";
+            } else if (enteredDate < currentDate) {
+              hasErrors = true;
+              document.getElementById("expiryDateError").innerHTML = "Expiry date shouldn't be less than start date";
+            }
+        
+            if (!discountType.value) {
+              hasErrors = true;
+              document.getElementById("discountTypeError").innerHTML = "This filed is required";
+            }
+
+            if(!discountAmount.value) {
+              hasErrors = true;
+              document.getElementById("discountAmountError").innerHTML = "This field is required";
+            } else if (!discountAmount.value.match(/^\d+$/) || parseInt(discountAmount.value) <= 0) {
+              hasErrors = true;
+              document.getElementById("discountAmountError").innerHTML = "Please enter a valid amount";
+            }
+           
+
+            if (hasErrors) {
+                event.preventDefault();
+            }
+        
+        });
+        
+
+    </script>
+    
+</body>
+
+</html>

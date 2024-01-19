@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') -%>
+</head>
+
+<body>
+
+        <%- include('../partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100">
+                <div class="row g-4 p-4">
+
+                    <div class="col-12">
+                        <h5 class="mb-2 ms-2 text-dark">COUPONS</h5>                   
+                        <div class="rounded h-100 p-4" style="background-color: #eeee;">
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="text-dark" >
+                                        <tr class="text-center" >
+                                            <th>CODE</th>
+                                            <th>DESCRIPTION</th>
+                                            <th>DISCOUNT TYPE</th>
+                                            <th>DISCOUNT</th>
+                                            <th>EXPIRATION</th>
+                                            <th>MIN PURCHASE AMT</th>
+                                            <th>USED</th>
+                                            <th>STATUS</th>
+                                            <th>ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultant-table">
+
+                                        <% if (!foundCoupons.length) { %>
+
+                                            <tr>
+                                                <td colspan="8"><i class="bi bi-search"></i> No Coupons found</td>
+                                            </tr>
+
+                                            
+                                        <% } else { %> 
+
+                                            <% foundCoupons.forEach((coupon)=> { %>
+                                                
+                                                <tr class="text-center" >
+                                                    
+                                                    <td>
+                                                        <%= coupon.code %>
+                                                    </td>
+                                                    <td>
+                                                        <%= coupon.description.substring(0, 10) %>
+                                                        <% if (coupon.description.length > 10){ %>
+                                                            <span>...</span>
+                                                        <% } %>
+
+                                                    </td>
+                                                    <td> 
+                                                        <% if (coupon.discountType === 'percentage') { %>
+                                                            Percentage
+                                                        <% } else { %>
+                                                            Fixed Amount
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <% if (coupon.discountType === 'percentage') { %>
+                                                            <%= coupon.discountAmount %>%
+                                                        <% } else { %>
+                                                            $<%= coupon.discountAmount %>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <%= coupon.expirationDate.toLocaleDateString() %>
+                                                    </td>
+                                                    <td>
+                                                        $<%= coupon.minPurchaseAmount %>
+                                                    </td>
+                                                    <td>                                                        
+                                                        <%= coupon.usedCount %>/<%= coupon.usageLimit %> 
+                                                    </td>
+                                                    <td>
+                                                        <strong class="<%= coupon.isActive ? 'text-success' : 'text-danger' %>" ><%= coupon.isActive ? 'Active' : 'Inactive' %></strong>
+                                                    </td>
+                                                    <td> 
+                                                        <div class="d-flex justify-content-center">
+
+                                                            <a href="/admin/edit-coupon/<%= coupon._id %>" class="text-dark mt-1 me-3"><i class="bi bi-pencil-square"></i></a>
+
+                                                            <form action="/admin/coupon/action/<%= coupon._id %>?_method=PATCH" method="post" >
+
+                                                            <% if(coupon.isActive === false ) { %>
+                                                                <input type="hidden" value="1" name="state">
+                                                                <button type="submit" class="btn btn-sm action-btn" style="width: 83px;background-color: rgb(38, 141, 38); color: white;">Activate</button>
+                                                            <% } else { %>
+                                                                <input type="hidden" value="" name="state">
+                                                                <button type="submit" class="btn btn-sm btn-primary action-btn" >Diactivate</button>
+                                                            <% } %>
+                            
+                                                            </form>
+
+                                                        </div>
+                                                        
+                                                    </td>
+                                                    
+                                                </tr>
+
+                                            <% }) %>
+                                            
+                                        <% } %>
+                                        
+                                    </tbody>
+                                </table>                    
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- pagination -->
+                <nav aria-label="Page navigation" class="d-flex justify-content-around align-items-center mt-3">
+                                
+                    <p> page <%= currentPage %> of <%= totalPages %></p>
+                 
+                    <ul class="pagination justify-content-center align-items-center">
+                        
+    
+                        
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link page-link-prev" href="<%= currentPage === 1 ? '#' : '/admin/coupons/' + (currentPage - 1) %>" aria-label="Previous" tabindex="-1" aria-disabled="<%= currentPage === 1 %>">
+                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                            </a>
+                        </li>
+                
+                        <% for (let page = 1; page <= totalPages; page++) { %>
+                            <li class="page-item <%= currentPage === page ? 'active' : '' %>" aria-current="<%= currentPage === page ? 'page' : '' %>">
+                                <a class="page-link" href="<%= '/admin/coupons/' + page %>"><%= page %></a>
+                            </li>
+                        <% } %>
+                
+                        <li class="page-item-total">of <%= totalPages %></li>
+                
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link page-link-next" href="<%= currentPage === totalPages ? '#' : '/admin/coupons/' + (currentPage + 1) %>" aria-label="Next">
+                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                            </a>
+                        </li>
+                       
+                    </ul>
+               
+                </nav>
+            </div>
+            <!-- Table End -->
+        
+
+            <%- include('../partials/footer') -%>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+</body>
+
+</html>

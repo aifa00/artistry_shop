@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>                                              
+
+        <main class="main">
+    
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/orders">Orders</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            
+
+            
+
+            <div class="page-content">
+            	<div class="cart">
+	                <div class="container">
+                        <h5 class="mb-2 ms-2 text-dark">ORDER DETAILS</h5>
+	                	<div class="row mt-4" style="padding-bottom: 10rem;">
+                            
+
+                            <!-- div left -->
+                            <div class="col-md-6">       
+                            
+                                <div class="d-flex justify-content-between align-items-center border p-3">
+                                    <div>
+                                        <h5 class="text-primary" ><%= foundOrder.products.populatedProduct.title %></h5>
+                                        <span><%= foundOrder.products.populatedProduct.description.substring(0, 30) + '...' %></span> <br>
+                                        Quantity: <%= foundOrder.products.quantity %><br>
+                                        <strong>&#8377; <%= foundOrder.products.populatedProduct.price %></strong>
+
+                                    </div>
+                                    <div>
+                                        <a href="/product/<%= foundOrder.products.populatedProduct._id %>">
+                                            <img src="<%= foundOrder.products.populatedProduct.images[0] %>" alt="img" height="100rem" width="100rem" style="border-radius: 1rem;">
+                                        </a>
+                                    </div>
+                                </div>         
+                            
+                                <div class="mt-4 pt-2 " >
+
+                                    <div class="mt-1" >
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <span style="margin-left: 3rem;">
+                                        Order Confirmed, <%= foundOrder.orderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                        </span>
+                                    </div> 
+
+                                    <% if (foundOrder.products.status ==='Cancelled') { %>
+
+                                    <div class="mt-1">
+                                        <i class="bi bi-check-circle-fill text-danger"></i>
+                                        <span style="margin-left: 3rem;">
+                                        Cancelled
+                                        </span>
+                                    </div>
+
+                                    <% } else { %>
+
+                                    <div class="mt-1">
+                                        <i class="bi bi-check-circle-fill <%= foundOrder.products.status ==='Shipped' || foundOrder.products.status ==='Delivered' ? 'text-success' : 'text-light' %>"></i>
+                                        <span style="margin-left: 3rem;">
+                                        <% const shippingDate=new Date(foundOrder.orderDate); %>
+                                        <% shippingDate.setDate(shippingDate.getDate() + 2); %>
+                                        Shipped, Expected By <%= shippingDate.toLocaleDateString('en-US', { month: 'short',  day: 'numeric', year: 'numeric' }) %>                                        
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-1">
+                                        <% const fourDaysLater = new Date (foundOrder.orderDate); %>
+                                        <% fourDaysLater.setDate(fourDaysLater.getDate() + 4) %>  
+                                        <% const currentDate = new Date(); %>                                     
+                                        <i class="bi bi-check-circle-fill <%= currentDate >= fourDaysLater || foundOrder.products.status ==='Delivered' ? 'text-success' : 'text-light' %>"></i>
+                                        <span style="margin-left: 3rem;" >
+                                        Out For Delivery 
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-1">                                                                                   
+                                        <i class="bi bi-check-circle-fill <%= foundOrder.products.status === 'Delivered' ? 'text-success' : 'text-light' %>"></i>
+                                        <span style="margin-left: 3rem;" >
+                                        Delivery, <%= foundOrder.deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                                        </span>
+                                    </div>
+                                    
+                                    <% } %>
+
+
+                                </div>
+                                                                                          
+                            </div>
+
+                            <!-- div right -->
+                            <div class="col-md-6" style="padding-left: 10rem;" >
+                                <div  class="mb-4">
+                                    <span class="text-primary text-uppercase">Shipping Details</span>
+                                    <p>
+                                        <strong class="text-uppercase" ><%= foundOrder.deliveryAddress.name %></strong> <br>
+                                        
+                                        <%= foundOrder.deliveryAddress.building %>,
+                                        <%= foundOrder.deliveryAddress.area %> <br>
+                                        <%= foundOrder.deliveryAddress.city %>,
+                                        <%= foundOrder.deliveryAddress.state %>,
+                                        <%= foundOrder.deliveryAddress.pincode %> <br>
+                                        Mob: <%= foundOrder.deliveryAddress.phone %> <br>                                        
+                                    </p>
+                            
+                                </div>
+                                
+
+                                <div  class="mb-4">
+                                    <% if (foundOrder.products.status === 'Processing') { %>                                    
+                                        <strong> Status: <span class="text-primary"><%= foundOrder.products.status %></span></strong>
+                                    <% } else if (foundOrder.products.status === 'Pending') { %>
+                                        <strong> Status: <span class="text-warning"><%= foundOrder.products.status %></span></strong>
+                                    <% } else if (foundOrder.products.status === 'Shipped') { %>
+                                        <strong> Status: <span class="text-info"><%= foundOrder.products.status %></span></strong>
+                                    <% } else if (foundOrder.products.status === 'Cancelled') { %>
+                                        <strong> Status: <span class="text-danger"><%= foundOrder.products.status %></span></strong>
+                                    <% } else if (foundOrder.products.status === 'Delivered') { %>
+
+                                        <% if (foundOrder.products.returnRequested !== 'Nil') { %>  
+
+                                            <% if (foundOrder.products.returnRequested === 'Initiated') { %>
+                                                <strong> Status: <span class="text-primary">Return <%= foundOrder.products.returnRequested %></span></strong>
+                                            <% } else if (foundOrder.products.returnRequested === 'Pending') { %>
+                                                <strong> Status: <span class="text-warning">Return <%= foundOrder.products.returnRequested %></span></strong>
+                                            <% } else if (foundOrder.products.returnRequested === 'Approved') { %>
+                                                <strong> Status: <span class="text-success">Return <%= foundOrder.products.returnRequested %></span></strong>
+                                            <% } else if (foundOrder.products.returnRequested === 'Rejected') { %>
+                                                <strong> Status: <span class="text-danger">Return <%= foundOrder.products.returnRequested %></span></strong>
+                                            <% } else if (foundOrder.products.returnRequested === 'Completed') { %>
+                                                <strong> Status: <span class="text-primary" >Returned</span></strong>
+                                            <% } %>
+                                            
+                                        <% } else { %>
+
+                                            <strong> Status: <span class="text-success"><%= foundOrder.products.status %></span></strong>
+
+                                        <% } %>
+                                        
+                                    <% } %>
+                                    
+                                </div>
+                                                        
+
+                                <div>
+                                    <span class="text-primary text-uppercase">Price Details</span>
+
+                                    <table class="w-100" >
+                                        <tbody>
+                                            <tr class="d-flex justify-content-between" >
+                                                <td>
+                                                    Selling Price
+                                                </td>
+                                                <td>
+                                                    &#8377;<%= foundOrder.products.populatedProduct.price.toFixed(2) %>
+                                                </td>
+                                            </tr>
+
+                                            <% if (foundOrder.offerDiscount) { %>
+                                                <tr class="d-flex justify-content-between text-dark " >
+                                                    <td>
+                                                        <span class="text-success">Your Savings</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-success">- &#8377;<%= foundOrder.offerDiscount.toFixed(2) %></span>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+    
+                                            <% if (foundOrder.couponApplied && foundOrder.couponApplied.discount !== undefined) { %>
+                                                <tr class="d-flex justify-content-between text-dark " >
+                                                    <td>
+                                                        Coupon Discount
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-success">- &#8377;<%= foundOrder.couponApplied.discount.toFixed(2) %></span>                                                        
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+
+                                            <% if (foundOrder.walletAmtUsed !== 0) { %>
+                                                <tr class="d-flex justify-content-between text-dark">
+                                                    <td>
+                                                        Paid By Wallet
+                                                    </td>
+                                                    <td>
+                                                        &#8377;<%= foundOrder.walletAmtUsed.toFixed(2) %>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+
+                                            <tr class="d-flex justify-content-between" >
+                                                <td>
+                                                    Shipping Fee
+                                                </td>
+                                                <td>
+                                                    &#8377;20.00
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr class="d-flex justify-content-between mt-1" >
+                                                <td>
+                                                    <strong>Total Amount</strong>
+                                                </td>
+                                                <td>
+                                                    <strong>&#8377;<%= foundOrder.totalAmount.toFixed(2) %></strong>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>      
+                                </div>
+
+                               <% if(foundOrder.products.status === 'Delivered') { %>
+                                <div>
+                                    <a href="/download-invoice?order=<%= encodeURIComponent(foundOrder._id) %>" class="btn btn-outline-primary btn-block mt-2">
+                                        Download Invoice <i class="bi bi-download"></i>
+                                    </a>
+                                </div>
+                               <% } %>
+                                
+                            </div>
+	                		
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+                </div><!-- End .cart -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+
+
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/main.js"></script>    
+    
+</body>
+</html>

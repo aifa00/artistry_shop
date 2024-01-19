@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>                                              
+
+        <main class="main">
+    
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>                                            
+                        <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
+                        <li class="breadcrumb-item" aria-current="page">New Address</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="container py-5">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-12 col-md-8 col-lg-6 col-xl-5" >
+                        <div class="card shadow-2-strong">
+        
+                                <div class="card-body  text-center">
+                                      <h4>ADD NEW ADDRESS</h4>
+                                </div>
+    
+                                <form  id="newAddressForm" action="/new-address" method="post" >
+                                    
+                                    <div class="formInput">                              
+                                        <label for="name">Name</label>
+                                        <input type="text" class="form-control form-control-md"  id="name" name="name"/>
+    
+                                        <span class="text-danger" id="nameError" ></span>
+                                    </div>
+
+                                    <div class="formInput">                              
+                                        <label for="phone">Phone</label>
+                                        <input type="tel" class="form-control form-control-md"  id="phone" name="phone"/>
+    
+                                        <span class="text-danger" id="phoneError" ></span>
+                                    </div>
+
+                                    <div class="formInput">                              
+                                        <label for="area">Area, Street or Locality</label>
+                                        <input type="text" class="form-control form-control-md"  id="area" name="area"/>
+    
+                                        <span class="text-danger" id="areaError" ></span>
+                                    </div>
+
+                                    <div class="formInput">                              
+                                        <label for="building">Building or House</label>
+                                        <input type="text" class="form-control form-control-md"  id="building" name="building"/>
+    
+                                        <span class="text-danger" id="buildingError" ></span>
+                                    </div>                                                                                   
+        
+                                    <div class="formInput">                              
+                                        <label for="pincode">Pincode/zip code</label>
+                                        <input type="tel" class="form-control form-control-md"  id="pincode" name="pincode"/>
+    
+                                        <span class="text-danger" id="pincodeError" ></span>
+                                    </div>
+
+                                    <div class="formInput">                              
+                                        <label for="state">State</label>
+                                        <input type="text" class="form-control form-control-md"  id="state" name="state"/>
+    
+                                        <span class="text-danger" id="stateError" ></span>
+                                    </div>
+
+                                    <div class="formInput">                              
+                                        <label for="city">City</label>
+                                        <input type="text" class="form-control form-control-md"  id="city" name="city"/>
+    
+                                        <span class="text-danger" id="cityError" ></span>
+                                    </div>
+                                  
+                                    <span class="text-danger" id="commonError" ><%= error %></span>
+                                    <div  class="card-body text-center">
+                                       <button class="btn btn-primary" type="submit">ADD ADDRESS</button>
+                                    </div>
+                        
+                                </form>
+    
+                        </div>
+                      </div>
+                  </div>
+              </div>
+
+            
+
+        </main><!-- End .main -->
+
+        <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+    
+    <script>
+        const newAddressForm = document.getElementById('newAddressForm');
+        const name = document.getElementById('name');
+        const phone = document.getElementById('phone');
+        const area = document.getElementById('area');
+        const building = document.getElementById('building');            
+        const pincode = document.getElementById('pincode');
+        const state = document.getElementById('state');
+        const city = document.getElementById('city');        
+    
+        newAddressForm.addEventListener('submit', (event) => {
+          
+          //set has errors false by default
+          let hasErrors = false;
+    
+          //clear previous messages
+          document.getElementById("commonError").innerHTML = "";  
+          document.getElementById("nameError").innerHTML = ""; 
+          document.getElementById("phoneError").innerHTML = "";         
+          document.getElementById("areaError").innerHTML = "";
+          document.getElementById("buildingError").innerHTML = "";
+          document.getElementById("pincodeError").innerHTML = "";     
+          document.getElementById("stateError").innerHTML = "";          
+          document.getElementById("cityError").innerHTML = "";          
+            
+
+          if (!name.value) {
+              hasErrors = true;
+              document.getElementById("nameError").innerHTML = "This field is required";
+          } else if (!name.value.match (/^[A-Za-z\s]+$/)) {
+            hasErrors = true;
+            document.getElementById("nameError").innerHTML = "Enter a valid name";
+          }
+            
+          if (!phone.value) {
+            hasErrors = true;
+            document.getElementById("phoneError").innerHTML = "This field is required";
+          } else if (phone.value.length !== 10) {
+            hasErrors = true;
+            document.getElementById("phoneError").innerHTML = "Please enter a valid phone number";
+          }
+            
+          if (!area.value) {
+            hasErrors = true;
+            document.getElementById("areaError").innerHTML = "This field is required";
+          } else if (!area.value.match (/^[A-Za-z\s.,]+$/)) {
+            hasErrors = true;
+            document.getElementById("areaError").innerHTML = "Enter a valid area or locality";
+          }
+
+          if (!building.value) {
+            hasErrors = true;
+            document.getElementById("buildingError").innerHTML = "This field is required";
+          } else if (!building.value.match (/^[A-Za-z\s\d.]+$/)) {
+            hasErrors = true;
+            document.getElementById("buildingError").innerHTML = "Enter a valid building name";
+          }
+
+          if (!pincode.value) {
+            hasErrors = true;
+            document.getElementById("pincodeError").innerHTML = "This field is required";
+          } else if (!pincode.value.match (/^\d+$/)) {
+            hasErrors = true;
+            document.getElementById("pincodeError").innerHTML = "Enter a valid code";
+          }
+
+          if (!state.value) {
+            hasErrors = true;
+            document.getElementById("stateError").innerHTML = "This field is required";
+          } else if (!state.value.match (/^[A-Za-z\s]+$/)) {
+            hasErrors = true;
+            document.getElementById("stateError").innerHTML = "Enter a valid state";
+          }
+        
+          if (!city.value) {
+            hasErrors = true;
+            document.getElementById("cityError").innerHTML = "This field is required";
+          } else if (!city.value.match (/^[A-Za-z\s]+$/)) {
+            hasErrors = true;
+            document.getElementById("cityError").innerHTML = "Enter a valid city name";
+          }
+            
+
+            
+          if (hasErrors) {
+            event.preventDefault();
+          }
+
+        });
+    </script>
+    
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/main.js"></script>
+      
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>                                              
+
+        <main class="main">
+    
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/cart">Cart</a></li>
+                        <li class="breadcrumb-item"><a href="/checkout">Checkout</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Change Address</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->                    
+
+            <div class="page-content">            	                    
+	                <div class="container">
+                        
+	                	<div class="row" style="padding: 0 10rem;">
+                            <h5 style="margin-left: 10px;" >SELECT ADDRESS</h5>
+                            <% if (foundAddress.length === 0) { %>
+                                <div class="vh-100" >
+                                    NO ADDRESS FOUND
+                                </div>
+                            <% } else { %>
+                                <% foundAddress.forEach ((address) => { %>
+                                    <div class="col-md-12">
+
+                                        <form id="<%= address._id %>" action="/change-address" method="post">
+                                            <div class="col-lg-12 p-4 border mb-3">
+                                                <div style="display: flex;justify-content: space-between;">
+                                                  <div style="cursor: pointer;" onclick="changeAddress('<%= address._id %>')" >
+                                                      <span class="d-block text-primary h6 text-uppercase"><%= address.name %></span>                        
+                                                      <span class="d-block text-primary h6 text-uppercase"><%= address.phone %></span>                        
+                                                      <p class="mb-0">
+                                                      <%= address.area %>,
+                                                      <%= address.building %>,<br>                                                 
+                                                      <%= address.city %>,
+                                                      <%= address.state %>,    
+                                                      <%= address.pincode %>
+                                                      </p>
+                                                  </div>
+                                        </form>
+                                                  <div class="d-flex flex-column justify-content-between align-items-end">
+
+                                                    <a style="margin-left: 10px; font-size: 15px;cursor: pointer;" data-toggle="modal" data-target="#editModal<%= address._id %>" ><i class="bi bi-pencil-square"></i></a>
+
+                                                    <input type="hidden" name="addressId" value="<%= address._id %>">
+                                                    <% if (address.default) { %>
+                                                        <p class="text-primary" style="font-weight: 500;font-size: 15px;">Selected Address <i class="bi bi-check-circle"></i></p>
+                                                                                                        
+                                                    <% } %>
+
+                                                    
+                                                    <!-- Modal to edit address  -->                                                   
+                                                    <div class="modal fade" id="editModal<%= address._id %>">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                          <div class="modal-content">
+                                                            <div class="card shadow-2-strong" style="padding: 8rem;">
+                                                                
+                                                                <div class="card shadow-2-strong">
+                                                    
+                                                                    <div class="card-body  text-center">
+                                                                          <h4>EDIT ADDRESS</h4>
+                                                                    </div>
+                                                                    
+                                                                    <form  class="editAddressForm" action="/edit-address/<%= address._id %>" method="post" >
+                                                                        
+                                                                        <div class="formInput">                              
+                                                                            <label for="name">Name</label>
+                                                                            <input type="text" class="form-control form-control-md name" value="<%= address.name %>" name="name"/>
+                                            
+                                                                            <span class="text-danger nameError"></span>
+                                                                        </div>
+                                            
+                                                                        <div class="formInput">                              
+                                                                            <label for="phone">Phone</label>
+                                                                            <input type="tel" class="form-control form-control-md phone" value="<%= address.phone %>" name="phone"/>
+                                            
+                                                                            <span class="text-danger phoneError"></span>
+                                                                        </div>
+                                            
+                                                                        <div class="formInput">                              
+                                                                            <label for="area">Area, Street or Locality</label>
+                                                                            <input type="text" class="form-control form-control-md area" value="<%= address.area %>" name="area"/>
+                                            
+                                                                            <span class="text-danger areaError"></span>
+                                                                        </div>
+                                            
+                                                                        <div class="formInput">                              
+                                                                            <label for="building">Building or House</label>
+                                                                            <input type="text" class="form-control form-control-md building" value="<%= address.building %>" name="building"/>
+                                            
+                                                                            <span class="text-danger buildingError" ></span>
+                                                                        </div>                                                                                   
+                                            
+                                                                        <div class="formInput">                              
+                                                                            <label for="pincode">Pincode/Zip code</label>
+                                                                            <input type="tel" class="form-control form-control-md pincode" value="<%= address.pincode %>" name="pincode"/>
+                                            
+                                                                            <span class="text-danger pincodeError" ></span>
+                                                                        </div>
+                                            
+                                                                        <div class="formInput">                              
+                                                                            <label for="state">State</label>
+                                                                            <input type="text" class="form-control form-control-md state" value="<%= address.state %>" name="state"/>
+                                            
+                                                                            <span class="text-danger stateError"></span>
+                                                                        </div>
+                                            
+                                                                        <div class="formInput">                              
+                                                                            <label for="city">City</label>
+                                                                            <input type="text" class="form-control form-control-md city" value="<%= address.city %>" name="city"/>
+                                            
+                                                                            <span class="text-danger cityError"></span>
+                                                                        </div>
+                                                                      
+                                                                        
+                                                                        <div  class="card-body text-center">
+                                                                           <input type="hidden" value="change-address" name="from" >
+                                                                           <button class="btn btn-primary" type="submit">EDIT ADDRESS</button>
+                                                                        </div>
+                                                            
+                                                                    </form>                                                                                                        
+                                                              </div>                                                                
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                       </div><!-- modal end -->                                                                                                      
+                                                  </div>    
+                                                </div>                                                                                                                                                                                                                                       
+                                              </div>                                        
+                                    </div>
+                                <% }) %>
+                            <% } %>
+
+                              
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+                <!-- </div> -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        
+        <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+
+    
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/main.js"></script>
+    
+    <script>
+        function changeAddress(formId) {
+            const form = document.getElementById(formId);
+            form.submit();
+        }
+    </script>
+    
+    <script>
+    // when form is in loop, applying validation using class name 
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const editAddressForms = document.querySelectorAll('.editAddressForm');//Returns nodelist of all forms with class name editAddressForm
+        
+        editAddressForms.forEach(function (form) {
+
+        form.addEventListener('submit', function (event) {
+            // Get the corresponding elements using class names
+            const nameInput = form.querySelector('.name');
+            const phoneInput = form.querySelector('.phone');
+            const areaInput = form.querySelector('.area');
+            const buildingInput = form.querySelector('.building');
+            const pincodeInput = form.querySelector('.pincode');
+            const stateInput = form.querySelector('.state');
+            const cityInput = form.querySelector('.city');
+
+            // Get the corresponding error spans
+            const nameError = form.querySelector('.nameError');
+            const phoneError = form.querySelector('.phoneError');
+            const areaError = form.querySelector('.areaError');
+            const buildingError = form.querySelector('.buildingError');
+            const pincodeError = form.querySelector('.pincodeError');
+            const stateError = form.querySelector('.stateError');
+            const cityError = form.querySelector('.cityError');
+
+            // Reset previous error messages
+            nameError.textContent = "";
+            phoneError.textContent = "";
+            areaError.textContent = "";
+            buildingError.textContent = "";
+            pincodeError.textContent = "";
+            stateError.textContent = "";
+            cityError.textContent = "";
+
+            // Your validation logic here
+            let hasErrors = false;
+
+            if (!nameInput.value.trim()) {
+                hasErrors = true;
+                nameError.textContent = "Name is required";
+            } else if (!nameInput.value.match(/^[A-Za-z\s]+$/)) {
+                hasErrors = true;
+                nameError.textContent = "Enter a valid name";
+            }
+
+            if (!phoneInput.value.trim()) {
+                hasErrors = true;
+                phoneError.textContent = "Phone is required";
+            } else if (!phoneInput.value.match(/^\d{10}$/)) {
+                hasErrors = true;
+                phoneError.textContent = "Enter a valid 10-digit phone number";
+            }
+
+            if (!areaInput.value.trim()) {
+                hasErrors = true;
+                areaError.textContent = "Area is required";
+            } else if (!areaInput.value.match(/^[A-Za-z\s.,]+$/)) {
+                hasErrors = true;
+                areaError.textContent = "Enter a valid area or locality";
+            }
+
+            if (!buildingInput.value.trim()) {
+                hasErrors = true;
+                buildingError.textContent = "Building is required";
+            } else if (!buildingInput.value.match(/^[A-Za-z\s\d.]+$/)) {
+                hasErrors = true;
+                buildingError.textContent = "Enter a valid building name";
+            }
+
+            if (!pincodeInput.value.trim()) {
+                hasErrors = true;
+                pincodeError.textContent = "Pincode is required";
+            } else if (!pincodeInput.value.match(/^\d+$/)) {
+                hasErrors = true;
+                pincodeError.textContent = "Enter a valid pincode";
+            }
+
+            if (!stateInput.value.trim()) {
+                hasErrors = true;
+                stateError.textContent = "State is required";
+            } else if (!stateInput.value.match(/^[A-Za-z\s]+$/)) {
+                hasErrors = true;
+                stateError.textContent = "Enter a valid state";
+            }
+
+            if (!cityInput.value.trim()) {
+                hasErrors = true;
+                cityError.textContent = "City is required";
+            } else if (!cityInput.value.match(/^[A-Za-z\s]+$/)) {
+                hasErrors = true;
+                cityError.textContent = "Enter a valid city name";
+            }
+
+
+            // Prevent the form from submitting if there are errors
+            if (hasErrors) {
+                event.preventDefault(); 
+            }
+        });
+    });
+});
+
+</script>
+
+</body>
+</html>

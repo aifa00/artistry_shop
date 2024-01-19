@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') -%>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
+</head>
+
+<body>
+
+        <%- include('./partials/header') -%>
+                            
+            <div class="container-fluid pt-4 px-4" >
+
+                <h5 class="mb-2 ms-4 text-dark">DASHBOARD</h5>
+                                                
+                <!-- Sale & Revenue Start -->
+                <div class="container-fluid pt-4 px-4">
+                    <div class="row g-4">
+                        <div class="col-sm-6 col-xl-3">
+        
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fas fa-shopping-cart fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Today's Orders</p>
+                                    <h6 class="mb-0 text-dark"><%= todaysOrders %></h6>
+                                </div>
+                            </div>
+        
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+        
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Monthly Orders</p>
+                                    <h6 class="mb-0 text-dark"><%= totalOrdersThisMonth %></h6>
+                                </div>
+                            </div>
+        
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fas fa-users fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Monthly Customers</p>
+                                    <h6 class="mb-0 text-dark"><%= totalCustomersThisMonth %></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="rounded d-flex align-items-center justify-content-between p-4" style="background-color: #eeee;">
+                                <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                                <div class="ms-3">
+                                    <p class="mb-2">Monthly Revenue</p>
+                                    <h6 class="mb-0 text-dark"><%= totalRevenueThisMonth.toFixed(2) %></h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Sale & Revenue End -->
+        
+                
+                <div class="row g-4 p-4" >
+
+                    <div class="d-flex flex justify-content-end">
+
+                        <!-- Form 1: Select Custom Date -->
+                        <form action="/admin/dashboard?filtered=true" method="post" id="customDateForm" class="flex-wrap mt-2">
+                            <div class="d-flex flex-column">
+                                <div class="d-flex me-4">
+                                    <div class="me-2">
+                                        <input class="form-control" style="background-color: #eeee; border: none;" type="date" value="<%= startDate !== null ? startDate : '' %>" name="from" id="dateFrom">
+                                    </div>
+                                    <div class="me-2">
+                                        <input class="form-control" style="background-color: #eeee; border: none;" type="date" value="<%= endDate !== null ? endDate : '' %>" name="upto" id="dateUpto">
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" type="submit">Apply</button>
+                                </div>
+    
+                                <div class="mt-2">
+                                    <span class="text-danger" id="error"></span>
+                                </div>
+                            </div>
+                        </form>
+
+
+                        <!-- Form 2: Select Payment -->
+                        <form action="/admin/dashboard?filtered=true" method="post" id="filterForm" class="flex-wrap mt-2">                           
+                                <div class="me-2">
+                                    <select class="form-select" style="background-color: #eeee; border: none;" name="filterDate" id="filterDate">
+                                        <option value="">Filter By</option>
+                                        <option value="past30Days" <%= filterDate === 'past30Days' ? 'selected' : '' %>>Past 30 days</option>
+                                        <option value="past12Months" <%= filterDate === 'past12Months' ? 'selected' : '' %>>Past 12 Months</option>
+                                    </select>
+                                </div>                               
+                        </form>
+                    
+                        <!-- Form 3: Select Year -->
+                        <form action="/admin/dashboard?filtered=true" method="post" id="yearForm" class="flex-wrap mt-2">                           
+                                <div>
+                                    <select class="form-select" style="background-color: #eeee; border: none;" name="year" id="year">
+                                        <% const currentDate = new Date() %>
+                                        <option value="">Year</option>
+                                        <% for (let i = 2020; i <= currentDate.getFullYear(); i++) { %>
+                                            <option value="<%= i %>" <%= year === `${i}` ? 'selected' : '' %>><%= i %></option>
+                                        <% } %>
+                                    </select>
+                                </div>                             
+                        </form>                                                                                                
+                        
+                    </div>                                
+
+                    <div class="col-12"> 
+                                     
+                        <div class="rounded h-100 d-flex" style="background-color: #eeee;">
+                            <div class="col-lg-6 text-center ms-4">
+                                <h6 class="mb-3 mt-4 text-dark">Monthly Sales</h6>
+                                <div class=" rounded h-100 p-4" id="ordersPerMonth">
+                                    
+                                    <canvas id="bar-chart"></canvas>
+                                </div>
+
+                            </div>
+                            <div class="col-lg-6 text-center d-flex flex-column align-items-center">
+                                <h6 class="mb-3 mt-4 text-dark">Payment Method Distribution</h6>
+                                <div class="rounded h-100 p-4" id="revenueByPaymentMethod" style="max-width: fit-content;" >
+                                    
+                                    <canvas id="pie-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+                
+                <%- include('./partials/footer') -%>
+            </div>
+            
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+
+    <script>
+        const revenueByCod = '<%= revenueByPaymentMethod.cod ? revenueByPaymentMethod.cod : 0 %>';
+        const revenueBywallet = '<%= revenueByPaymentMethod.wallet ? revenueByPaymentMethod.wallet : 0 %>';
+        const revenueByRazorpay = '<%= revenueByPaymentMethod.razorpay ? revenueByPaymentMethod.razorpay : 0 %>';
+
+
+
+        if (revenueByCod === '0' && revenueBywallet === '0' && revenueByRazorpay === '0') {
+            document.getElementById('ordersPerMonth').innerHTML = 'No data available';
+            document.getElementById('revenueByPaymentMethod').innerHTML = 'No data available';
+        } else {    
+    // Pie Chart
+    var ctx5 = $("#pie-chart").get(0).getContext("2d");
+    var myChart5 = new Chart(ctx5, {
+        type: "pie",
+        data: {
+            labels: ['COD', 'Wallet', 'Online'],
+            datasets: [{
+                backgroundColor: [
+                    "rgba(235, 22, 22, .9)",
+                    "rgba(235, 22, 22, .7)",
+                    "rgba(235, 22, 22, .5)",                
+                ],
+                data: [revenueByCod, revenueBywallet, revenueByRazorpay]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+       
+        // Single Bar Chart
+        var ctx4 = $("#bar-chart").get(0).getContext("2d");
+        var myChart4 = new Chart(ctx4, {
+        type: "bar",        
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Monthly Sales',
+                backgroundColor: [
+                    "rgba(235, 22, 22, .7)",
+                    "rgba(235, 22, 22, .6)",
+                    "rgba(235, 22, 22, .5)",
+                    "rgba(235, 22, 22, .4)",
+                    "rgba(235, 22, 22, .3)",
+                    "rgba(235, 22, 22, .7)",
+                    "rgba(235, 22, 22, .6)",
+                    "rgba(235, 22, 22, .5)",
+                    "rgba(235, 22, 22, .4)",
+                    "rgba(235, 22, 22, .3)",
+                    "rgba(235, 22, 22, .4)",
+                    "rgba(235, 22, 22, .3)",
+                ],
+                data: [
+                '<%= ordersPerMonth[0] %>',
+                '<%= ordersPerMonth[1] %>',
+                '<%= ordersPerMonth[2] %>',
+                '<%= ordersPerMonth[3] %>',
+                '<%= ordersPerMonth[4] %>',
+                '<%= ordersPerMonth[5] %>',
+                '<%= ordersPerMonth[6] %>',
+                '<%= ordersPerMonth[7] %>',
+                '<%= ordersPerMonth[8] %>',
+                '<%= ordersPerMonth[9] %>',
+                '<%= ordersPerMonth[10] %>',
+                '<%= ordersPerMonth[11] %>',
+              ],    
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true, // Set to false if you want the axis to start at the minimum value
+                    max: 10, // Set a specific maximum value for the y-axis
+                }            
+            },
+            responsive: true,
+        }
+    });
+        
+
+    }
+    </script>
+    <script>
+        const customDateForm = document.getElementById('customDateForm');
+        const dateFrom = document.getElementById('dateFrom');
+        const dateUpto = document.getElementById('dateUpto');
+      
+        customDateForm.addEventListener('submit', (event) => {
+          // set has errors false by default
+          let hasErrors = false;
+      
+          // clear previous messages
+          document.getElementById("error").innerHTML = "";
+         
+
+          let currentDate = new Date();
+          currentDate.setHours(23, 59, 59, 9999);// Set to end of the day
+
+          // Validate the date range between 2020 and current date
+          const minAllowedDate = new Date('2020-01-01');
+          const maxAllowedDate = currentDate;
+
+
+          let fromDate = new Date(dateFrom.value);
+          
+          let uptoDate = new Date(dateUpto.value);
+
+
+          if (!dateFrom.value || !dateUpto.value) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "Please provide both 'from' and 'upto' dates";
+          } else if (fromDate > uptoDate) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "'From' shouldn't be greater than 'upto' date";
+          } else if (isNaN(fromDate.getTime()) || isNaN(uptoDate.getTime())) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "Please enter valid dates.";
+          } else if (fromDate < minAllowedDate || uptoDate > maxAllowedDate) {
+            hasErrors = true;
+            document.getElementById('error').innerHTML = "Please enter valid dates.";
+          }
+      
+          if (hasErrors) {
+            event.preventDefault();
+          }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#year').change( function() {
+                $('#yearForm').submit();
+            } )
+
+            $('#filterDate').change(function() {
+                $('#filterForm').submit();
+            })
+        })
+        
+    </script>
+   
+</body>
+
+</html>

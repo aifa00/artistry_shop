@@ -1,0 +1,128 @@
+<header class="header">
+    <div class="header-middle sticky-header">
+        <div class="container">
+            <div class="header-left">
+                <button class="mobile-menu-toggler">
+                    <span class="sr-only">Toggle mobile menu</span>
+                    <i class="icon-bars"></i>
+                </button>
+
+                <a href="/" class="logo">
+                    <h4 style="font-weight: 800; color: rgb(0, 0, 0);letter-spacing: 1px; font-size: 2.3rem; margin-top: 2rem;" id="logoName">ARTISTRY</h4>
+                </a>
+
+                <nav class="main-nav">
+                    <ul class="menu sf-arrows">
+                        <li class="megamenu-container">
+                            <a href="/">HOME</a>
+
+                            
+                        </li>
+                        <li>
+                            <a href="/shop" >SHOP</a>
+
+                            
+                        </li>
+                        
+                    </ul><!-- End .menu -->
+                </nav><!-- End .main-nav -->
+            </div><!-- End .header-left -->
+
+            <div class="header-right">
+                
+                <!-- here where search comes -->
+
+                <% if(!isLoggedIn) { %>
+                    <a href="/login" style="color: rgb(0, 0, 0); font-size: 14px; margin-left: 25px; text-decoration: none; font-weight: 500;">
+                        LOGIN
+                    </a>
+
+                    <a href="/register" style="color: rgb(0, 0, 0); font-size: 14px; margin-left: 25px; text-decoration: none;font-weight: 500;">
+                        SIGNUP
+                    </a>
+
+               <% } else { %>
+
+                  <div class="dropdown">
+                    <a style="margin-left: 30px; font-size: 30px;cursor: pointer;" href="" role="button" data-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person"></i>
+                    </a>
+                  
+                    <ul class="dropdown-menu px-5" style="font-size: 15px;">
+                      <li><a class="dropdown-item " href="/profile">My profile</a></li>  
+                      <li><a class="dropdown-item " href="/orders">My Orders</a></li>
+                      <li><a class="dropdown-item " href="/coupons">Coupons</a></li>
+                      <li><a class="dropdown-item " href="/wallet">Wallet</a></li>
+                      <li>
+                        <button class="dropdown-item" data-toggle="modal" data-target="#modalToLogout">Logout</button>
+                      </li>
+
+                    </ul>
+                  </div>
+
+                  <!-- modal to logout -->
+                  <div class="modal fade" id="modalToLogout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header ps-5">
+                          <h5 class="modal-title" id="exampleModalLabel">LOGOUT</h5>
+                        </div>
+                        <div class="modal-body p-4">                        
+                            <P> Are you sure you want to logout ?</P>       
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+                          <form action="/logout" method="post">
+                            <button type="submit" class="btn btn-primary">LOGOUT</button>
+                          </form>     
+                        </div>
+                      </div>
+                    </div>
+                  </div>        
+                <%} %>
+                <div class="dropdown cart-dropdown">
+                    <a href="/cart" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false" data-display="static">
+                        <i class="icon-shopping-cart"></i>                                
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- alert message -->
+<% if (message) { %>
+    <div class="alert alert-dismissible fade alert-<%= message.type %> show" id="alertMsg" role="alert" 
+        style="border-radius: 10px; position: fixed; top: 65px; right: 40px; z-index: 1000;">
+            
+        <div class="row">
+            <div class="col">
+                <p class="text-white py-1" style="margin-right: 4rem;"><%= message.message %></p>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> 
+            </div>
+        </div>
+            
+    </div>
+<% } %>
+
+
+    <script>
+    // Add a script to hide the alert after 3 seconds
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            var alertMsg = document.getElementById("alertMsg");
+            alertMsg.classList.remove("show");
+            alertMsg.classList.add("fade");
+            alertMsg.style.opacity = 0;
+            setTimeout(function () {
+                alertMsg.style.display = "none";
+            }, 500); // assuming the fade transition duration is 0.5 seconds
+        }, 3500); // 3500 milliseconds = 3.5 seconds
+    });
+    </script>

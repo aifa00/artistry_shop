@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    
+    <title>Pay with Razorpay</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js" data-key="<%= key_id %>"></script>
+</head>
+
+<body>
+    <h5 id="paymentProcessing" style="display: block;">Payment processing...</h5>
+    <div class="container mt-5 vh-100  d-flex flex-column align-items-center justify-content-center">        
+        <span id="error" class="text-danger"></span><br>
+        <a id="backToCheckout" href="/checkout" class="btn btn-primary" style="display: none;" >Go back to checkout</a>
+    </div>
+
+    
+
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/main.js"></script>
+
+
+    <script>
+
+    const paymentProcessing = document.getElementById("paymentProcessing");
+    const error = document.getElementById("error");
+    const backToCheckout = document.getElementById("backToCheckout");
+        
+
+    var options = {
+        "key" :'<%= key_id %>', // Enter the Key ID generated from the Dashboard
+        "amount": '<%= order.amount %>', // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "ARTISTRY",
+        "description": 'Order Payment',
+        "order_id": '<%= order.id %>',
+        "modal": {
+            // This function is called when the modal is dismissed
+            ondismiss: function() {   
+
+                window.location.href = '/checkout';
+
+            },
+        
+        },
+        "handler": function (response){
+
+            if (response.razorpay_payment_id) {
+                const transactionId = response.razorpay_payment_id;//razorpay transaction id or payment id
+                const orderId = response.razorpay_order_id;
+                const signature = response.razorpay_signature;
+
+
+                // Send an AJAX POST request to save the order
+                $.ajax({
+                type: 'POST',
+                url: '/save-rzp-order',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    transactionId,
+                    orderId,                    
+                    signature,
+                    amount: "<%= order.amount %>",
+                    offerDiscount: "<%= offerDiscount %>",
+                    walletAmountApplied: "<%= walletAmountApplied %>",
+                    referralCode: "<%= referralCode %>",
+                }),
+
+                success: function(data) {
+                    window.location.href = "/order-placed";
+                },
+
+                error: function(xhr, textStatus, errorThrown) {                    
+                    paymentProcessing.style.display = 'none';
+                    error.textContent = "Order failed. Order is not placed !";
+                    backToCheckout.style.display = 'block';
+                }
+                });
+
+            } else {
+                // Display a message or handle it appropriately
+                headingElement.style.display = 'none';
+                errorElement.textContent = "Payment cancelled or unsuccessful";
+                linkElement.style.display = 'block';
+            }
+                
+        },
+        "prefill": {
+            "name": '<%= currentUser.name %>',
+            "email": '<%= currentUser.email %>',
+            "contact": '<%= currentUser.phone %>',
+        },
+        "theme": {
+            "color": "#c15454"
+        }
+    };
+
+
+    var razorpay = new Razorpay(options);
+    razorpay.open();
+
+
+    </script>
+
+</body>
+
+</html>

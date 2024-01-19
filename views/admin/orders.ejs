@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+
+        <%- include('./partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100">
+                <div class="row g-4 p-4">
+
+                    <div class="col-12">
+                        <h5 class="mb-2 ms-2 text-dark">ORDERS</h5>                   
+                        <div class="rounded h-100 p-4" style="background-color: #eeee;">
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="text-dark" >
+                                        <tr class="text-center" >                                         
+                                            <th>ORDER DATE</th>
+                                            <th>DELIVERY ADDRESS</th>
+                                            <th>OREDR DETAILS</th>
+                                            <th>STATUS</th>                    
+                                            <th>&nbsp;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultant-table">
+
+                                        <% if (!orders.length) { %>
+
+                                            <tr>
+                                                <td colspan="5"><i class="bi bi-search"></i> NO ORDERS FOUND</td>
+                                            </tr>
+
+                                            
+                                        <% } else { %> 
+
+                                            <% orders.forEach((order,i)=> { %>
+                                                
+                                                <tr>                                                    
+                                                    <td  class="text-center" > 
+                                                        Order Confirmed: <br>
+                                                        <%= order.orderDate.toLocaleDateString() %> <br>
+                                                        Delivery Expected: <br>
+                                                        <%= order.deliveryDate.toLocaleDateString() %> <br>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <%= order.deliveryAddress.name %>,
+                                                        <%= order.deliveryAddress.building %>,<br>
+                                                        <%= order.deliveryAddress.area %>,<br>
+                                                        <%= order.deliveryAddress.city %>,
+                                                        <%= order.deliveryAddress.state %>,
+                                                        <%= order.deliveryAddress.pincode %><br>
+                                                        mob: <%= order.deliveryAddress.phone %>,
+                                                    </td>
+                                                    <td class="text-center" style="max-width: 10rem;" >
+                                                        <div style="border-bottom: 1px solid black;">
+                                                        
+                                                            <div class="mb-3">
+                                                                <small class="text-primary text-uppercase"><strong><%= order.orderedProducts[0].title %></strong></small><br>                                                                
+                                                                <small>Price: ₹ <%= order.orderedProducts[0].price %>,</small>
+                                                                <small>Quantity: <%= order.products.quantity %></small>
+                                                            </div>
+                                                        
+                                                        </div>
+
+                                                        <span>
+                                                            <strong>
+                                                              Total Amount: <%= order.totalAmount.toFixed(2) %><br>
+                                                              Payment Method: <%= order.paymentMethod %>
+                                                            </strong>
+                                                        </span>
+
+                                                    </td>                                                    
+                                                    <td class="text-center"  >
+                                                      
+                                                           <div style="margin-top: 3.3rem;" >
+                                                                <% if (order.products.status === 'Cancelled') { %>                                                                   
+                                                                    <strong class="text-danger"><%= order.products.status %></strong>
+                                                                <% } else if (order.products.status === 'Delivered') { %>
+                                                                    <strong class="text-success"><%= order.products.status %></strong>                                                                    
+                                                                <% } else { %>
+                                                                    <strong class="text-light"><%= order.products.status %></strong>                                                                    
+                                                                <% } %>
+                                                            </div>
+
+                                                    </td>
+                                                                                                                                                           
+                                                    <td>
+                                                        <div  style="margin-top: 3.3rem;">
+                                                            <a style="color: blue;" href="/admin/single-order/<%= order._id %>/<%= order.products.product %>">View</a>                                                          
+                                                        </div>
+                                                        
+                                                    </td>
+                                                                                                                                                                                                                
+                                                </tr>
+
+                                            <% }) %>
+                                            
+                                        <% } %>
+                                        
+                                    </tbody>
+                                </table>                    
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- pagination -->
+                <nav aria-label="Page navigation" class="d-flex justify-content-around align-items-center mt-3">
+                                
+                    <p> page <%= currentPage %> of <%= totalPages %></p>
+                 
+                    <ul class="pagination justify-content-center align-items-center">
+                        
+    
+                        
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link page-link-prev" href="<%= currentPage === 1 ? '#' : '/admin/orders/' + (currentPage - 1) %>" aria-label="Previous" tabindex="-1" aria-disabled="<%= currentPage === 1 %>">
+                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                            </a>
+                        </li>
+                
+                        <% for (let page = 1; page <= totalPages; page++) { %>
+                            <li class="page-item <%= currentPage === page ? 'active' : '' %>" aria-current="<%= currentPage === page ? 'page' : '' %>">
+                                <a class="page-link" href="<%= '/admin/orders/' + page %>"><%= page %></a>
+                            </li>
+                        <% } %>
+                
+                        <li class="page-item-total">  of  <%= totalPages %></li>
+                
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link page-link-next" href="<%= currentPage === totalPages ? '#' : '/admin/orders/' + (currentPage + 1) %>" aria-label="Next">
+                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                            </a>
+                        </li>
+                       
+                    </ul>
+               
+                </nav>
+            </div>
+            
+        
+
+            <%- include('./partials/footer') -%>
+
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+
+    <script>
+    
+
+        function updateOrderStatus(formId) {
+            document.getElementById(formId).submit();
+
+        }
+
+    </script>
+    
+</body>
+
+</html>

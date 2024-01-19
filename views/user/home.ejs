@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>
+
+        <main class="main">
+            <div class="intro-slider-container mb-0">
+                <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{"nav": false, "dots": false}'>
+
+
+                    <div class="intro-slide" style="background-image: url('<%= heroBanners[0].images[0] %>');">
+                        <div class="container intro-content text-center" style="margin-top: 22rem;" >
+                            <h3 class="intro-subtitle text-white"><%= heroBanners[0].description %></h3><!-- End .h3 intro-subtitle -->
+                            <h1 class="intro-title text-white"><%= heroBanners[0].title %></h1><!-- End .intro-title -->
+                            <div class="intro-text text-white">Online Only</div><!-- End .intro-text -->
+                            <a href="<%= heroBanners[0].url %>" class="btn btn-primary">Discover NOW</a>
+                        </div><!-- End .intro-content -->
+                    </div><!-- End .intro-slide -->
+
+
+                    <div class="intro-slide" style="background-image: url('<%= heroBanners[1].images[0] %>');">
+                        <div class="container intro-content text-center" style="margin-bottom: 10rem;" >
+                            
+                            <h3 class="intro-subtitle text-white"><%= heroBanners[1].description %></h3>
+                            <h1 class="intro-title text-white"><%= heroBanners[1].title %></h1>
+                            
+                            <a href="<%= heroBanners[1].url %>" class="btn btn-primary">Shop NOW</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <span class="slider-loader text-white"></span>
+            </div>
+
+            <div class="brands-border owl-carousel owl-simple mb-5" data-toggle="owl" 
+                data-owl-options='{
+                    "nav": false, 
+                    "dots": false,
+                    "margin": 0,
+                    "loop": false,
+                    "responsive": {
+                        "0": {
+                            "items":2
+                        },
+                        "420": {
+                            "items":3
+                        },
+                        "600": {
+                            "items":4
+                        },
+                        "900": {
+                            "items":5
+                        },
+                       
+                    }
+                }'>               
+            </div>
+
+            <div class="container">
+                <div class="banner-group">
+                    <div class="row">
+                    
+                        <div class="col-md-6">
+                            <div class="banner banner-border-hover">
+                                <a href="<%= featuredBanners[0].url %>">
+                                    <img src="<%= featuredBanners[0].images[0] %>" alt="Banner">
+                                </a>
+
+                                <div class="banner-content">
+                                    <h4 class="banner-subtitle"><a href="#"><%= featuredBanners[0].description %></a></h4>
+                                    <h3 class="banner-title"><a href="#"><span><%= featuredBanners[0].title %></span></a></h3>
+                                    <a href="<%= featuredBanners[0].url %>" class="btn btn-outline-primary-2 banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
+                                </div>
+                            </div>                            
+                        </div>
+                        
+
+                        <div class="col-md-6">                         
+                            <div class="banner banner-border-hover">
+                                <a href="<%= featuredBanners[1].url %>">
+                                    <img src="<%= featuredBanners[1].images[0] %>" alt="Banner">
+                                </a>
+
+                                <div class="banner-content">
+                                    <h4 class="banner-subtitle"><a href="#"><%= featuredBanners[1].description %></a></h4>
+                                    <h3 class="banner-title"><a href="#"><span><%= featuredBanners[1].title %></span></a></h3>
+                                    <a href="<%= featuredBanners[1].url %>" class="btn btn-outline-primary-2 banner-link">Discover Now<i class="icon-long-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- End .row -->
+                </div><!-- End .banner-group -->
+            </div><!-- End .container -->
+
+            <div class="mb-4"></div><!-- End .mb-6 -->
+
+            <div class="container">
+                <div class="heading heading-center mb-3">
+                    <h2 class="title">Trendy Products</h2><!-- End .title -->
+
+                    <ul class="nav nav-pills justify-content-center" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="trendy-all-link" data-toggle="tab" href="#trendy-all-tab" role="tab" aria-controls="trendy-all-tab" aria-selected="true">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="trendy-women-link" data-toggle="tab" href="#trendy-women-tab" role="tab" aria-controls="trendy-women-tab" aria-selected="false">Canvas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="trendy-men-link" data-toggle="tab" href="#trendy-men-tab" role="tab" aria-controls="trendy-men-tab" aria-selected="false">Paintings</a>
+                        </li>
+                       
+                    </ul>
+                </div><!-- End .heading -->
+
+                <div class="tab-content tab-content-carousel">
+                    <div class="tab-pane p-0 fade show active" id="trendy-all-tab" role="tabpanel" aria-labelledby="trendy-all-link">
+                        <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                            data-owl-options='{
+                                "nav": false, 
+                                "dots": true,
+                                "margin": 20,
+                                "loop": false,
+                                "responsive": {
+                                    "0": {
+                                        "items":2
+                                    },
+                                    "480": {
+                                        "items":2
+                                    },
+                                    "768": {
+                                        "items":3
+                                    },
+                                    "992": {
+                                        "items":4
+                                    },
+                                    "1200": {
+                                        "items":4,
+                                        "nav": true
+                                    }
+                                }
+                            }'>
+                            <% allProducts.forEach((product) => { %>
+                                <div class="product product-2">
+                                <figure class="product-media">
+                                    <a href="/product/<%= product._id %>">
+                                        <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
+                                        <img src="<%= product.images[1] %>" alt="Product image" class="product-image-hover">
+                                    </a>                                   
+
+                                    <form class="addToCartForm" action="/add-to-cart" method="post">
+                                        <div class="product-action">
+                                            <% if(!product.stock) { %>
+                                                <a href="#" class="btn-product"><span>Currently Unavailable</span></a>                                      
+                                            <% } else { %>
+                                                <% if (isLoggedIn) { %>
+                                                    <% if (currentUser && currentUser.cart.some(item => item.product.toString() === product._id.toString() )) { %>
+                                                        <div class="product-action product-action-transparent">
+                                                            <a href="/cart" class="btn-product btn-cart"><span>Go To Cart</span></a>
+                                                        </div>
+                                                        
+                                                    <% } else { %>
+                                                        <input type="hidden" name="product" value="<%= product._id %>">
+                                                        <input type="hidden" name="fixedQuantity" value="1"> 
+                                                        <input type="hidden" name="from" value="shop">
+                                                        <div class="product-action product-action-transparent">
+                                                            <button type="submit" class="btn btn-product btn-cart" id="addToCartBtn<%= product._id %>" >
+                                                                <span>Add To Cart</span>
+                                                            </button>
+                                                        </div>
+                                                        
+                                                    <% } %>   
+                                                <% } else { %>
+                                                    <div class="product-action product-action-transparent">
+                                                        <a href="/login" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                    </div>                                                                    
+                                                <% } %>                                                                      
+                                            <% } %>
+                                        </div>
+                                    </form>
+
+                                </figure><!-- End .product-media -->
+
+                                <div class="product-body">
+                                    <div class="product-cat">
+                                        <a href="/product/<%= product._id %>"><%= product.category.name %></a>
+                                    </div><!-- End .product-cat -->
+                                    <h3 class="product-title"><a href="/product/<%= product._id %>"><%= product.title%></a></h3><!-- End .product-title -->
+                                    <div class="product-price">
+                                        <% let discountPercentage = 0; %>
+                                        <% const currentDate = new Date() %>
+
+                                        <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>   
+                                            <% discountPercentage += product.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (product.category.isOfferActive && currentDate <= product.category.offerValidUpto) { %>   
+                                            <% discountPercentage += product.category.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (discountPercentage > 90) { %>
+                                            <% discountPercentage = 90 %>
+                                        <% } %>
+
+
+                                        <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                            <% const discountedPrice = product.price - (discountPercentage/100) * product.price %>  
+                                            <h6>
+                                                <span>&#8377; <%= discountedPrice %></span>
+                                                <small style="text-decoration: line-through;color:#999;">&#8377; <%= product.price %></small>
+                                                <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                            </h6>                                
+                                            
+                                        <% } else { %>
+                                            <h6>&#8377; <%= product.price %></h6>
+                                        <% } %>                                         
+                                    </div>                                 
+                                </div><!-- End .product-body -->
+                            </div><!-- End .product --> 
+                            <% }) %>                                                  
+                        </div><!-- End .owl-carousel -->
+                    </div><!-- .End .tab-pane -->
+
+                    <div class="tab-pane p-0 fade" id="trendy-women-tab" role="tabpanel" aria-labelledby="trendy-women-link">
+                        <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                            data-owl-options='{
+                                "nav": false, 
+                                "dots": true,
+                                "margin": 20,
+                                "loop": false,
+                                "responsive": {
+                                    "0": {
+                                        "items":2
+                                    },
+                                    "480": {
+                                        "items":2
+                                    },
+                                    "768": {
+                                        "items":3
+                                    },
+                                    "992": {
+                                        "items":4
+                                    },
+                                    "1200": {
+                                        "items":4,
+                                        "nav": true
+                                    }
+                                }
+                            }'>
+                            <% canvas.forEach((product) => { %>
+                                <div class="product product-2">
+                                <figure class="product-media">
+                                    <a href="/product/<%= product._id %>">
+                                        <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
+                                        <img src="<%= product.images[1] %>" alt="Product image" class="product-image-hover">
+                                    </a>
+                                    
+                                    <form class="addToCartForm" action="/add-to-cart" method="post">
+                                        <div class="product-action">
+                                            <% if(!product.stock) { %>
+                                                <a href="#" class="btn-product"><span>Currently Unavailable</span></a>                                      
+                                            <% } else { %>
+                                                <% if (isLoggedIn) { %>
+                                                    <% if (currentUser && currentUser.cart.some(item => item.product.toString() === product._id.toString() )) { %>
+                                                        <div class="product-action product-action-transparent">
+                                                            <a href="/cart" class="btn-product btn-cart"><span>Go To Cart</span></a>
+                                                        </div>
+                                                        
+                                                    <% } else { %>
+                                                        <input type="hidden" name="product" value="<%= product._id %>">
+                                                        <input type="hidden" name="fixedQuantity" value="1"> 
+                                                        <input type="hidden" name="from" value="shop">
+                                                        <div class="product-action product-action-transparent">
+                                                            <button type="submit" class="btn btn-product btn-cart" id="addToCartBtn<%= product._id %>" >
+                                                                <span>Add To Cart</span>
+                                                            </button>
+                                                        </div>
+                                                        
+                                                    <% } %>   
+                                                <% } else { %>
+                                                    <div class="product-action product-action-transparent">
+                                                        <a href="/login" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                    </div>                                                                    
+                                                <% } %>                                                                      
+                                            <% } %>
+                                        </div>
+                                    </form>
+
+                                </figure><!-- End .product-media -->
+
+                                <div class="product-body">
+                                    <div class="product-cat">
+                                        <a href="#"><%= product.category.name %></a>
+                                    </div><!-- End .product-cat -->
+                                    <h3 class="product-title"><a href="/product/<%= product._id %>"><%= product.title%></a></h3><!-- End .product-title -->
+                                    <div class="product-price">
+                                        <% let discountPercentage = 0; %>
+                                        <% const currentDate = new Date() %>
+
+                                        <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>   
+                                            <% discountPercentage += product.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (product.category.isOfferActive && currentDate <= product.category.offerValidUpto) { %>   
+                                            <% discountPercentage += product.category.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (discountPercentage > 90) { %>
+                                            <% discountPercentage = 90 %>
+                                        <% } %>
+
+
+                                        <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                            <% const discountedPrice = product.price - (discountPercentage/100) * product.price %>  
+                                            <h6>
+                                                <span>&#8377; <%= discountedPrice %></span>
+                                                <small style="text-decoration: line-through;color:#999;">&#8377; <%= product.price %></small>
+                                                <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                            </h6>                                
+                                            
+                                        <% } else { %>
+                                            <h6>&#8377; <%= product.price %></h6>
+                                        <% } %>                                         
+                                    </div>                                      
+                                </div><!-- End .product-body -->
+                            </div><!-- End .product --> 
+                            <% }) %>   
+                        </div><!-- End .owl-carousel -->
+                    </div><!-- .End .tab-pane -->
+                    <div class="tab-pane p-0 fade" id="trendy-men-tab" role="tabpanel" aria-labelledby="trendy-men-link">
+                        <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                            data-owl-options='{
+                                "nav": false, 
+                                "dots": true,
+                                "margin": 20,
+                                "loop": false,
+                                "responsive": {
+                                    "0": {
+                                        "items":2
+                                    },
+                                    "480": {
+                                        "items":2
+                                    },
+                                    "768": {
+                                        "items":3
+                                    },
+                                    "992": {
+                                        "items":4
+                                    },
+                                    "1200": {
+                                        "items":4,
+                                        "nav": true
+                                    }
+                                }
+                            }'>
+                            <% paintings.forEach((product) => { %>
+                                <div class="product product-2">
+                                <figure class="product-media">
+                                    <a href="/product/<%= product._id %>">
+                                        <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
+                                        <img src="<%= product.images[1] %>" alt="Product image" class="product-image-hover">
+                                    </a>
+                                   
+                                    <form class="addToCartForm" action="/add-to-cart" method="post">
+                                        <div class="product-action">
+                                            <% if(!product.stock) { %>
+                                                <a href="#" class="btn-product"><span>Currently Unavailable</span></a>                                      
+                                            <% } else { %>
+                                                <% if (isLoggedIn) { %>
+                                                    <% if (currentUser && currentUser.cart.some(item => item.product.toString() === product._id.toString() )) { %>
+                                                        <div class="product-action product-action-transparent">
+                                                            <a href="/cart" class="btn-product btn-cart"><span>Go To Cart</span></a>
+                                                        </div>
+                                                        
+                                                    <% } else { %>
+                                                        <input type="hidden" name="product" value="<%= product._id %>">
+                                                        <input type="hidden" name="fixedQuantity" value="1"> 
+                                                        <input type="hidden" name="from" value="shop">
+                                                        <div class="product-action product-action-transparent">
+                                                            <button type="submit" class="btn btn-product btn-cart" id="addToCartBtn<%= product._id %>" >
+                                                                <span>Add To Cart</span>
+                                                            </button>
+                                                        </div>
+                                                        
+                                                    <% } %>   
+                                                <% } else { %>
+                                                    <div class="product-action product-action-transparent">
+                                                        <a href="/login" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                    </div>                                                                    
+                                                <% } %>                                                                      
+                                            <% } %>
+                                        </div>
+                                    </form>
+                                    
+                                </figure><!-- End .product-media -->
+
+                                <div class="product-body">
+                                    <div class="product-cat">
+                                        <a href="#"><%= product.category.name %></a>
+                                    </div><!-- End .product-cat -->
+                                    <h3 class="product-title"><a href="/product/<%= product._id %>"><%= product.title%></a></h3><!-- End .product-title -->
+                                    <div class="product-price">
+                                        <% let discountPercentage = 0; %>
+                                        <% const currentDate = new Date() %>
+
+                                        <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>   
+                                            <% discountPercentage += product.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (product.category.isOfferActive && currentDate <= product.category.offerValidUpto) { %>   
+                                            <% discountPercentage += product.category.offerPercentage %>
+                                        <% } %> 
+
+                                        <% if (discountPercentage > 90) { %>
+                                            <% discountPercentage = 90 %>
+                                        <% } %>
+
+
+                                        <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                            <% const discountedPrice = product.price - (discountPercentage/100) * product.price %>  
+                                            <h6>
+                                                <span>&#8377; <%= discountedPrice %></span>
+                                                <small style="text-decoration: line-through;color:#999;">&#8377; <%= product.price %></small>
+                                                <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                            </h6>                                
+                                            
+                                        <% } else { %>
+                                            <h6>&#8377; <%= product.price %></h6>
+                                        <% } %>                                         
+                                    </div>                                    
+                                </div><!-- End .product-body -->
+                            </div><!-- End .product --> 
+                            <% }) %>   
+                        </div><!-- End .owl-carousel -->
+                    </div><!-- .End .tab-pane -->                  
+                </div><!-- End .tab-content -->
+            </div><!-- End .container -->
+
+            <div class="mb-5"></div><!-- End .mb-5 -->
+
+        
+
+            <div class="container pt-6 new-arrivals">
+                <div class="heading heading-center mb-3">
+                    <h2 class="title">New Arrivals</h2><!-- End .title -->
+
+                    <ul class="nav nav-pills justify-content-center" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="new-all-link" data-toggle="tab" href="#new-all-tab" role="tab" aria-controls="new-all-tab" aria-selected="true">All</a>
+                        </li>
+                    </ul>
+                </div><!-- End .heading -->
+
+                <div class="tab-content">
+                    <div class="tab-pane p-0 fade show active" id="new-all-tab" role="tabpanel" aria-labelledby="new-all-link">
+                        <div class="products">
+                            <div class="row justify-content-center">
+
+                                <% allProducts.forEach((product) => { %>
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product product-2">
+                                        <figure class="product-media">
+                                            <a href="/product/<%= product._id %>">
+                                                <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
+                                                <img src="<%= product.images[1] %>" alt="Product image" class="product-image-hover">
+                                            </a>
+                                            
+                                            <form class="addToCartForm" action="/add-to-cart" method="post">
+                                                <div class="product-action">
+                                                    <% if(!product.stock) { %>
+                                                        <a href="#" class="btn-product"><span>Currently Unavailable</span></a>                                      
+                                                    <% } else { %>
+                                                        <% if (isLoggedIn) { %>
+                                                            <% if (currentUser && currentUser.cart.some(item => item.product.toString() === product._id.toString() )) { %>
+                                                                <div class="product-action product-action-transparent">
+                                                                    <a href="/cart" class="btn-product btn-cart"><span>Go To Cart</span></a>
+                                                                </div>
+                                                                
+                                                            <% } else { %>
+                                                                <input type="hidden" name="product" value="<%= product._id %>">
+                                                                <input type="hidden" name="fixedQuantity" value="1"> 
+                                                                <input type="hidden" name="from" value="shop">
+                                                                <div class="product-action product-action-transparent">
+                                                                    <button type="submit" class="btn btn-product btn-cart" id="addToCartBtn<%= product._id %>" >
+                                                                        <span>Add To Cart</span>
+                                                                    </button>
+                                                                </div>
+                                                                
+                                                            <% } %>   
+                                                        <% } else { %>
+                                                            <div class="product-action product-action-transparent">
+                                                                <a href="/login" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                            </div>                                                                    
+                                                        <% } %>                                                                      
+                                                    <% } %>
+                                                </div>
+                                            </form>
+
+                                        </figure>
+
+                                        <div class="product-body">
+                                            <div class="product-cat">
+                                                <a href="#">Clothing</a>
+                                            </div><!-- End .product-cat -->
+                                            <h3 class="product-title"><a href="/product/<%= product._id %>"><%= product.title %></a></h3><!-- End .product-title -->
+                                            <div class="product-price">
+                                                <% let discountPercentage = 0; %>
+                                                <% const currentDate = new Date() %>
+        
+                                                <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>   
+                                                    <% discountPercentage += product.offerPercentage %>
+                                                <% } %> 
+        
+                                                <% if (product.category.isOfferActive && currentDate <= product.category.offerValidUpto) { %>   
+                                                    <% discountPercentage += product.category.offerPercentage %>
+                                                <% } %> 
+        
+                                                <% if (discountPercentage > 90) { %>
+                                                    <% discountPercentage = 90 %>
+                                                <% } %>
+        
+        
+                                                <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                                    <% const discountedPrice = product.price - (discountPercentage/100) * product.price %>  
+                                                    <h6>
+                                                        <span>&#8377; <%= discountedPrice %></span>
+                                                        <small style="text-decoration: line-through;color:#999;">&#8377; <%= product.price %></small>
+                                                        <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                                    </h6>                                
+                                                    
+                                                <% } else { %>
+                                                    <h6>&#8377; <%= product.price %></h6>
+                                                <% } %>                                         
+                                            </div>                                    
+                                        </div><!-- End .product-body -->
+                                    </div><!-- End .product -->
+                                </div><!-- End .col-sm-6 col-md-4 col-lg-3 -->
+                                <% }) %>                                                                                                           
+                                
+                            </div><!-- End .row -->
+                        </div><!-- End .products -->
+                    </div><!-- .End .tab-pane -->
+                                
+                </div><!-- End .tab-content -->
+                
+            </div><!-- End .container -->
+                
+            <div class="mb-2"></div><!-- End .mb-2 -->
+        </main><!-- End .main -->
+        <%- include('./partials/footer') -%>
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+    <%- include('./partials/mobileMenu') -%>
+
+
+    <script src="user/js/jquery.min.js"></script>
+    <script src="user/js/bootstrap.bundle.min.js"></script>
+    <script src="user/js/jquery.hoverIntent.min.js"></script>
+    <script src="user/js/jquery.waypoints.min.js"></script>
+    <script src="user/js/superfish.min.js"></script>
+    <script src="user/js/owl.carousel.min.js"></script>
+    <script src="user/js/jquery.magnific-popup.min.js"></script>
+    <script src="user/js/jquery.plugin.min.js"></script>
+    <script src="user/js/jquery.countdown.min.js"></script>
+    <script src="user/js/main.js"></script>
+    <script src="user/js/demos/demo-5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+
+
+    <script>
+
+        $(document).ready(function() {
+            // Handle the form submission with AJAX
+            $('.addToCartForm').submit(function(event) {
+                // Prevent the default form submission
+                event.preventDefault();
+    
+                // Collect form data
+                var formData = $(this).serialize();
+                console.log(formData);
+    
+                // Make an AJAX request
+                $.ajax({
+                    url: '/add-to-cart',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    
+    </script>
+</body>
+</html>

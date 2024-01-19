@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/cart.html  22 Nov 2019 09:55:06 GMT -->
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        
+        <%- include('./partials/header') -%>                                              
+
+        <main class="main">
+            <div class="page-content">            	
+	                <div class="container">
+	                	<div class="row">
+                            
+                            <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 70vh;">
+                                <strong>Your Order is Placed Successfully</strong>
+                                <img src="https://cdn0.iconfinder.com/data/icons/shift-free/32/Complete_Symbol-512.png" alt="img" height="100rem" width="100rem">
+                                <p class="my-3" >Thankyou for Your Purchase !</p>
+                                <a class="btn btn-primary" href="/orders">Go To Orders</a>
+                            </div>
+                              
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+
+
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/main.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') -%>
+</head>
+
+<body>
+
+        <%- include('../partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100">
+                <div class="row g-4 p-4">
+
+                    <div class="col-12">
+                        <h5 class="mb-2 ms-2 text-dark">ALL PRODUCTS</h5>                   
+                        <div class="rounded h-100 p-4" style="background-color: #eeee;">
+                            
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="text-dark" >
+                                        <tr class="text-center" >
+                                            <th>PRODUCT</th>
+                                            <th>NAME</th>
+                                            <th>CATEGORY</th>
+                                            <th>PRICE</th>
+                                            <th>STOCK</th>
+                                            <th>OFFER</th>
+                                            <th>OFF%</th>
+                                            <th>OFF VALID UPTO</th>
+                                            <th>ACTIONS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultant-table">
+
+                                        <% if (!productDatas.length) { %>
+
+                                            <tr>
+                                                <td colspan="6"><i class="bi bi-search"></i> NO PRODUCTS</td>
+                                            </tr>
+
+                                            
+                                        <% } else { %> 
+
+                                            <% productDatas.forEach((product)=> { %>
+                                                
+                                                <tr class="text-center" >
+                                                    <td> <img src="<%= product.images[0] %>" alt="img" class="rounded-circle" width="50px" height="50px"> </td>
+                                                    <td> <%= product.title %> </td>
+                                                    <td> <%= product.category.name %> </td>
+                                                    <td> ₹ <%= product.price %> </td>
+                                                    <td> <%= product.stock %> </td>
+
+                                                    <td>
+                                                        <% const currentDate = new Date() %>
+                                                        <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>
+                                                            <strong class="text-success">Active</strong> 
+                                                        <% } else { %>
+                                                            <strong class="text-danger">Inactive</strong> 
+                                                        <% } %> 
+                                                    </td>
+
+                                                    <td>                                                        
+                                                        <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>
+                                                            <strong class="text-success"><%= product.offerPercentage %> %</strong> 
+                                                        <% } else { %>
+                                                            <% if (product.offerPercentage) { %>
+                                                                <strong class="text-danger"><%= product.offerPercentage %> %</strong> 
+                                                            <% } else { %>
+                                                                <strong class="text-danger">0 %</strong> 
+                                                            <% } %>                                                            
+                                                        <% } %> 
+                                                    </td>
+
+                                                    <td>
+                                                        <% if (product.offerValidUpto) { %>
+                                                            <strong><%= product.offerValidUpto.toLocaleDateString() %></strong> 
+                                                        <% } else { %>
+                                                            <strong>Not Found</strong> 
+                                                        <% } %> 
+                                                    </td>
+                                                    
+                            
+                                                    <td>
+                                                        <div class="d-flex justify-content-center">
+
+                                                            <a href="/admin/edit-product/<%= product._id %>" class="text-dark mt-1 me-3"><i class="bi bi-pencil-square"></i></a>
+
+                                                            <form action="/admin/products/soft-delete/<%= product._id %>?_method=PATCH" method="post" >
+
+                                                                <input type="hidden" name="category" value="<%= product.category.name %>">
+
+                                                                <% if(product.softDeleted===true ) { %>
+                                                                    <input type="hidden" value="" name="state" >
+                                                                    <button type="submit" class="btn btn-sm action-btn me-2" style="width: 65px;background-color: rgb(38, 141, 38); color: white;">Enable</button>
+                                                                <% } else { %>
+                                                                    <input type="hidden" value="1" name="state" >
+                                                                    <button type="submit" class="btn btn-sm btn-primary action-btn me-2">Delete</button>
+                                                                <% } %>
+                                
+                                                            </form>
+
+                                                            <form action="/admin/products/action/offer/<%= product._id %>?_method=PATCH" method="post">
+
+                                                                <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>
+                                                                    <input type="hidden" value="" name="state" >
+                                                                    <button type="submit" class="btn btn-sm action-btn" style="background-color: #137fb1ee;color: white;">Diactivate Off</button>
+                                                                <% } else { %>
+                                                                    <input type="hidden" value="1" name="state" >
+                                                                    <button type="submit" class="btn btn-sm action-btn px-3" style="background-color: rgb(219, 189, 0); color: white;">
+                                                                        Activate Off
+                                                                    </button>
+                                                                <% } %> 
+
+                                                                
+                                                            </form>
+
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    
+                                                </tr>
+
+                                            <% }) %>
+                                            
+                                        <% } %>
+                                        
+                                    </tbody>
+                                </table>                    
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- pagination -->
+                <nav aria-label="Page navigation" class="d-flex justify-content-around align-items-center mt-3">
+                                
+                    <p> page <%= currentPage %> of <%= totalPages %></p>
+                 
+                    <ul class="pagination justify-content-center align-items-center">
+                        
+    
+                        
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link page-link-prev" href="<%= currentPage === 1 ? '#' : '/admin/products/' + (currentPage - 1) %>" aria-label="Previous" tabindex="-1" aria-disabled="<%= currentPage === 1 %>">
+                                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                            </a>
+                        </li>
+                
+                        <% for (let page = 1; page <= totalPages; page++) { %>
+                            <li class="page-item <%= currentPage === page ? 'active' : '' %>" aria-current="<%= currentPage === page ? 'page' : '' %>">
+                                <a class="page-link" href="<%= '/admin/products/' + page %>"><%= page %></a>
+                            </li>
+                        <% } %>
+                
+                        <li class="page-item-total">of <%= totalPages %></li>
+                
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link page-link-next" href="<%= currentPage === totalPages ? '#' : '/admin/products/' + (currentPage + 1) %>" aria-label="Next">
+                                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                            </a>
+                        </li>
+                       
+                    </ul>
+               
+                </nav>
+            </div>
+            
+            
+            <%- include('../partials/footer') -%>
+
+    </div>
+
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+</body>
+
+</html>

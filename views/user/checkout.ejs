@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') -%>
+</head>
+
+<body>
+    <div class="page-wrapper">
+
+        <%- include('./partials/header') -%>
+          
+
+        <main class="main">
+        	
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/cart">Cart</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="checkout">
+	                <div class="container">
+                        <h5 class="mb-2">BILLING DETAILS</h5>     
+
+		                	<div class="row">                                
+		                		<div class="col-lg-9">
+
+                                        <h6>SHIPPING ADDRESS</h6>
+	            						<div>
+                                    
+                                            <div class="form-group row">
+                                              <div class="col-md-12">
+                                                
+                                                <% if (defaultAddress) { %>
+                                                <div class="col-lg-12 p-4 border mb-1">
+                                                  <div style="display: flex;justify-content: space-between;" >
+                                                    <div>
+                                                        <span class="d-block text-primary h6 text-uppercase"><%= defaultAddress.name %></span>                        
+                                                        <span class="d-block text-primary h6 text-uppercase"><%= defaultAddress.phone %></span>                        
+                                                        <p class="mb-0">
+                                                        <%= defaultAddress.area %>,
+                                                        <%= defaultAddress.building %>,<br>                                                 
+                                                        <%= defaultAddress.city %>,
+                                                        <%= defaultAddress.state %>,    
+                                                        <%= defaultAddress.pincode %>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <a href="/change-address" class="btn btn-sm btn-outline-primary">Change Address</a>
+                                                    </div>
+
+                                                  </div>                                                                                                                                                                                                                                       
+                                                </div>
+                                                <% } else { %>
+                                                    <div style="display: flex;justify-content: space-between;" >
+                                                        <div class="col-lg-12 p-4 border mb-3">
+                                                            NO SHIPPING ADDRESS FOUND! ADD NEW ADDRESS.
+                                                        </div>                                                    
+                                                    </div>  
+                                                <% } %>
+
+                                              </div>
+                                            </div>
+
+                                            <div class="cart-discount">
+                                                <form action="/apply-coupon" method="post" >
+                                                    <div class="input-group">                                                                                                                
+                                                        <input type="text" class="form-control" placeholder="Apply coupon" name="coupon" >
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-primary-2" style="max-height: 0;padding: 1.8rem 0;" type="submit"><i class="icon-long-arrow-right"></i></button>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </form>
+                                                <span class="text-danger"><%= error %></span>
+                                                
+                                            </div>
+                                            <a data-toggle="modal" data-target="#couponModal" href="#">View Coupons</a>
+                                            
+
+                                            <div class="form-group row mt-1">
+                                              <div class="col-lg-12">
+                                                <button type="button" data-target="#addAddressModal"  data-toggle="modal" class="btn btn-primary btn-md">
+                                                  Add New Address +
+                                                </button>                                            
+                                              </div>
+                                            </div>
+                                            
+                                          </div>
+	                					
+		                		</div>
+
+		                		<aside class="col-lg-3">
+
+                                    <form action="/checkout" method="post" id="checkoutForm" >                                        
+
+                                        <% if (ordersLength === 0) { %>
+                                            <% if (currentUser.referrer) { %>
+                                                <input type="hidden" value="<%= currentUser.referrer %>" name="referralCode">
+                                            <% } else { %>
+                                            <div class="checkout-discount">                                         
+                                                <input type="text" class="form-control" name="referralCode" placeholder="Have a referral code ? Enter your code here.">
+                                            </div>
+                                            <% } %>
+                                        <% } %>
+                                    
+                                    
+		                			<div class="summary">
+		                				<h3 class="summary-title">Your Order</h3>
+
+		                				<table class="table table-summary">
+		                					<thead>
+		                						<tr >
+		                							<th>Product</th>                                                
+		                							<th>Total</th>
+		                						</tr>
+		                					</thead>
+
+		                					<tbody>
+                                                <% cartProducts.forEach ((cartItem) => { %>
+                                                    <tr>
+                                                        <td><a href="/product/<%= cartItem.product._id %>"><%= cartItem.product.title %></a><small>(qty:<%= cartItem.quantity %>)</small></td>                                                        
+                                                        <td>                                                            
+                                                            <div>
+                                                                <% let discountPercentage = 0; %>
+                                                                <% const currentDate = new Date() %>
+                        
+                                                                <% if (cartItem.product.isOfferActive && currentDate <= cartItem.product.offerValidUpto) { %>   
+                                                                    <% discountPercentage += cartItem.product.offerPercentage %>
+                                                                <% } %> 
+                        
+                                                                <% if (cartItem.product.category.isOfferActive && currentDate <= cartItem.product.category.offerValidUpto) { %>   
+                                                                    <% discountPercentage += cartItem.product.category.offerPercentage %>
+                                                                <% } %> 
+                        
+                                                                <% if (discountPercentage > 90) { %>
+                                                                    <% discountPercentage = 90 %>
+                                                                <% } %>
+                        
+                        
+                                                                <% let discountedPrice; %>
+                                                                <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                                                    <% discountedPrice = cartItem.product.price - (discountPercentage/100) * cartItem.product.price %>  
+                                                                    <strong>
+                                                                        <span>&#8377; <%= discountedPrice * cartItem.quantity %></span> <br>
+                                                                        <small style="text-decoration: line-through;color:#999;">&#8377; <%= cartItem.product.price %></small>
+                                                                        <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                                                    </strong>                                                                    
+                        
+                                                                <% } else { %>
+                                                                    <h6>&#8377; <%= cartItem.product.price %></h6>
+                                                                <% } %> 
+                                                                
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <% }) %>
+
+                                                <tr class="summary-shipping-row">
+                                                    <td>Total MRP:</td>
+                                                    <td id="totalMrp">&#8377; <%= totalMrp %></td>
+                                                </tr>
+		                						
+
+                                                <% if (offerDiscount) { %>
+                                                    <tr class="summary-shipping-row">
+                                                        <td>
+                                                            <div >
+                                                                <span class="text-success" style="font-weight: 400;">Your Savings</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-success" style="font-weight: 400;" id="offerDiscount">- &#8377; <%= offerDiscount %></span>
+                                                            <input type="hidden" value="<%= offerDiscount %>" name="offerDiscount">
+                                                        </td>
+                                                    </tr>
+                                                <% } %>
+		 
+		                						<tr class="summary-shipping-row">
+		                							<td>Subtotal:</td>
+		                							<td>&#8377; <%= subTotal %></td>
+		                						</tr>
+		                						
+                                                                                    
+                                                <tr class="summary-shipping-row">
+                                                    <% if (couponDiscount) { %>
+
+                                                        <td><span>Coupon Discount</span></td>
+                                                        <td><span class="text-success" style="font-weight: 400;" id="offerDiscount">- &#8377; <%= couponDiscount %></span></td>                                                        
+                                                    
+                                                    <% } %>
+                                                </tr>
+
+                                                <tr class="summary-shipping-row">
+		                							<td style="border-bottom: none;min-height: 0;">Shipping</td>
+		                							<td style="border-bottom: none;margin-bottom: -10px;" >&#8377; 20</td>
+                                                    
+		                						</tr>
+                                                
+                                                
+		                						<tr class="summary-total">
+		                							<td id="grandTotalLabel">Total:</td>
+		                							<td id="grandTotalAmount">&#8377; <%= (grandTotal).toFixed(2) %></td>                                                    
+		                						</tr>
+                                                <input type="hidden" value="<%= (grandTotal) %>" name="grandTotal">
+		                					</tbody>
+		                				</table>
+                                        
+		                				
+                                            <div class="accordion-summary" id="accordion-payment">
+                                                <h6>Payment:</h6>
+                                                <div>
+                                                    <input type="radio" name="paymentMethod" id="cod" value="cod">
+                                                    <label for="cod">Cash on delivery</label>
+                                                </div>
+    
+                                                <div>
+                                                    <input type="radio" class="collapsed" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="false" aria-controls="collapse-4" name="paymentMethod" id="wallet" value="wallet">
+                                                    <label for="wallet">Wallet</label>
+
+                                                    <input type="hidden" value="" name="walletAmountApplied"  id="walletAmountApplied" >
+
+                                                    <div id="collapse-1" class="collapse" aria-labelledby="heading-4" data-parent="#accordion-payment">
+                                                        <div class="card-body p-1">
+
+                                                           <div style="background-color: rgb(232, 232, 232); display: flex; justify-content: space-between;align-items: center; padding-left: 1rem;">
+                                                            <small>Available Balance: &#8377; <span id="availableBalance" ><%= currentUser.wallet.balance %></span> </small>
+                                                            <div>
+                                                                <button type="button" id="applyWallet" class="btn btn-primary" style="min-width: 0px;">Continue</button>
+                                                            </div>
+                                                           </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>                                               
+										        
+
+                                                <div>
+                                                    <input type="radio" name="paymentMethod" id="razorpay" value="razorpay">
+                                                    <label for="razorpay">Razorpay</label>
+                                                </div>									                                                                                                    
+                                                
+                                                
+                                                <img class="mt-1" src="/user/images/payments-summary.png" alt="payments cards">
+    
+                                            </div>
+                                            
+                                            <span class="text-danger mb-1" id="checkoutError"></span>
+                                            <button type="button" id="placeOrderButton" data-toggle="modal" data-target="#placeOrderModal" class="btn btn-outline-primary-2 btn-order btn-block">
+                                                Place Order
+                                            </button>                                           
+                                        </form>
+                                        
+		                			</div>
+		                		</aside>
+		                	</div>            			
+	                </div><!-- End .container -->
+                </div><!-- End .checkout -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+        <!-- modal to place order -->
+        <div class="modal fade" id="placeOrderModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h6 class="modal-title" id="exampleModalLabel">PLACE ORDER</h6>
+                </div>
+                <div class="modal-body p-4">
+                    <P> Are you sure you want to place this order ?</P>  
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+                  <button type="button" class="btn btn-primary" id="placeOrderBtn" >PLACE ORDER</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- coupon Modal -->
+          <div class="modal fade" id="couponModal">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="card shadow-2-strong" style="padding: 2rem;">
+                           
+                    <% if (!foundCoupons.length) { %>
+
+                        <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 20vh;">
+                            <H6>NO COUPONS FOUND</H6>                            
+                        </div>
+                        
+                    <% } else { %> 
+
+                        <div class="d-flex flex-column align-items-center p-4">
+                            <h5>AVAILABLE COUPONS</h5>
+                            <% foundCoupons.forEach((coupon) => { %>
+                                <div class="col-lg-12 border p-2 mt-2">
+                                    <div style="display: flex;justify-content: space-between;">
+
+                                      <div>                                          
+                                          <p>
+                                            <strong class="text-primary" ><%= coupon.description %></strong> <br>
+                                            <strong class="text-success" >
+                                                Get <%= coupon.discountType === 'percentage' ? `${coupon.discountAmount}%` : `₹ ${coupon.discountAmount}` %> off
+                                            </strong> <br>
+                                            <% if (coupon.minPurchaseAmount !== 0) { %>
+                                                Get extra <%= coupon.discountType === 'percentage' ? `${coupon.discountAmount}%` : `₹ ${coupon.discountAmount}` %> off on minimum purchase of &#8377; <%= coupon.minPurchaseAmount %> <br>
+                                            <% } %>
+                                            <div style="display: flex; justify-content: space-between; padding: 0.3rem 1rem; border: 2px dotted #be1717; max-width: 20rem;">
+                                              <strong id="couponCode<%= coupon._id %>" class="text-dark"><%= coupon.code %></strong>
+                                              <span id="clipboardIcon<%= coupon._id %>" onclick="copyCodeToClipboard('<%= coupon._id %>')" style="cursor: pointer;">
+                                                  <i class="bi bi-clipboard"></i> Copy
+                                              </span>
+                                              <span id="checkIcon<%= coupon._id %>" style="display: none;">
+                                                  <i class="bi bi-check-lg"></i> Copied
+                                              </span>
+                                          </div>
+                                          </p>
+                                      </div>
+                                      <div>
+                                          <strong>Valid till <%= coupon.expirationDate.toLocaleDateString('en-US', { month:'short', day: 'numeric', year: 'numeric' }) %></strong>
+                                      </div>
+    
+                                    </div>                                                                                                                                                                                                                                       
+                                </div>
+                            <% }) %>                         
+                        </div>
+
+                    <% } %>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal to add address  -->
+          <div class="modal fade" id="addAddressModal">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="card shadow-2-strong" style="padding: 8rem;">
+        
+                    <div class="card-body  text-center">
+                          <h4>ADD NEW ADDRESS</h4>
+                    </div>
+
+                    <form id="newAddressForm" action="/new-address" method="post" >
+                        
+                        <div class="formInput">                              
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control form-control-md"  id="name" name="name"/>
+
+                            <span class="text-danger" id="nameError" ></span>
+                        </div>
+
+                        <div class="formInput">                              
+                            <label for="phone">Phone</label>
+                            <input type="tel" class="form-control form-control-md"  id="phone" name="phone"/>
+
+                            <span class="text-danger" id="phoneError" ></span>
+                        </div>
+
+                        <div class="formInput">                              
+                            <label for="area">Area, Street or Locality</label>
+                            <input type="text" class="form-control form-control-md"  id="area" name="area"/>
+
+                            <span class="text-danger" id="areaError" ></span>
+                        </div>
+
+                        <div class="formInput">                              
+                            <label for="building">Building or House</label>
+                            <input type="text" class="form-control form-control-md"  id="building" name="building"/>
+
+                            <span class="text-danger" id="buildingError" ></span>
+                        </div>                                                                                   
+
+                        <div class="formInput">                              
+                            <label for="pincode">Pincode/zip code</label>
+                            <input type="tel" class="form-control form-control-md"  id="pincode" name="pincode"/>
+
+                            <span class="text-danger" id="pincodeError" ></span>
+                        </div>
+
+                        <div class="formInput">
+                            <label for="state">State</label>
+                            <input type="text" class="form-control form-control-md"  id="state" name="state"/>
+
+                            <span class="text-danger" id="stateError" ></span>
+                        </div>
+
+                        <div class="formInput">                              
+                            <label for="city">City</label>
+                            <input type="text" class="form-control form-control-md"  id="city" name="city"/>
+
+                            <span class="text-danger" id="cityError" ></span>
+                        </div>
+                      
+                        <input type="hidden" value="checkout" name="from" >                        
+
+                        <div  class="card-body text-center">
+                           <button class="btn btn-primary" type="submit">ADD ADDRESS</button>
+                        </div>
+            
+                    </form>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <%- include('./partials/footer') -%>
+
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <%- include('./partials/mobileMenu') -%>
+    
+
+    
+    
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/main.js"></script>
+
+    <script>
+
+        // Prevent the default form submission of checkout form
+        document.getElementById('checkoutForm').addEventListener('submit', function(event) {        
+            event.preventDefault();
+        });
+
+
+
+
+        $(document).ready(function () {
+            $('input[name="paymentMethod"]').change(function () {
+                if ($(this).val() === 'razorpay') {
+                    $('#placeOrderButton').show();
+                    
+                } else if ($(this).val() === 'wallet') {
+                    $('#placeOrderButton').hide();
+                    
+                } else {
+                    $('#placeOrderButton').show();
+                    
+                }
+            });
+        });
+
+
+        
+
+        document.getElementById('applyWallet').addEventListener('click', function(e) {
+
+            e.preventDefault();
+
+            const data = {
+                grandTotal: '<%= grandTotal %>',
+            }
+
+
+            $.ajax({
+            url: '/apply-wallet',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: function(response) {
+
+                if (response.message === 'Insufficient wallet balance !') {
+                    $('#checkoutError').text(response.message);             
+                };
+
+                if (response.success === true) {
+                    $('#grandTotalLabel').text('Amount Payable:');
+
+                    // Update the "Total" value
+                    $('#grandTotalAmount').html('&#8377;' + response.amountPayable.toFixed(2));
+
+                    //Update the available balance in wallet
+                    $('#availableBalance').text(('<%= currentUser.wallet.balance %>' - response.walletAmountApplied));
+
+                    // Update the hidden input value
+                    $('#walletAmountApplied').val(response.walletAmountApplied);
+                    
+
+                    if (response.amountPayable === 0) {
+                        //show the place order button
+                        $('#placeOrderButton').show();
+                        //disable all other options
+                        $('input[name="paymentMethod"]').not('#wallet').prop('disabled', true);
+                    }
+                    
+                };
+                
+            },
+            error: function(xhr, status, error) {
+                console.log(status);
+            }
+            });
+
+        });
+
+
+
+
+
+
+        const form = document.getElementById ('checkoutForm');
+
+
+        $('#placeOrderBtn').on('click', function(event) {
+
+            document.getElementById('checkoutError').innerHTML = '';
+
+            const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+
+            const isPaymentSelected = [...paymentMethods].some(radio => radio.checked);
+            
+            if (!isPaymentSelected) {
+                
+                document.getElementById('checkoutError').innerHTML = 'Please select a payment method.'
+                
+                event.preventDefault();
+            } else {
+                form.submit();
+            }
+            
+        });
+
+
+
+        //form validation
+        const newAddressForm = document.getElementById('newAddressForm');
+        const name = document.getElementById('name');
+        const phone = document.getElementById('phone');
+        const area = document.getElementById('area');
+        const building = document.getElementById('building');            
+        const pincode = document.getElementById('pincode');
+        const state = document.getElementById('state');
+        const city = document.getElementById('city');        
+    
+        newAddressForm.addEventListener('submit', (event) => {
+          
+          //set has errors false by default
+          let hasErrors = false;
+    
+          //clear previous messages
+        //   document.getElementById("commonError").innerHTML = "";  
+          document.getElementById("nameError").innerHTML = ""; 
+          document.getElementById("phoneError").innerHTML = "";         
+          document.getElementById("areaError").innerHTML = "";
+          document.getElementById("buildingError").innerHTML = "";
+          document.getElementById("pincodeError").innerHTML = "";     
+          document.getElementById("stateError").innerHTML = "";          
+          document.getElementById("cityError").innerHTML = "";          
+            
+
+          if (!name.value) {
+              hasErrors = true;
+              document.getElementById("nameError").innerHTML = "This field is required";
+          } else if (!name.value.match (/^[A-Za-z\s]+$/)) {
+            hasErrors = true;
+            document.getElementById("nameError").innerHTML = "Enter a valid name";
+          }
+            
+          if (!phone.value) {
+            hasErrors = true;
+            document.getElementById("phoneError").innerHTML = "This field is required";
+          } else if (!phone.value.match(/^\d{10}$/)) {
+            hasErrors = true;
+            document.getElementById("phoneError").innerHTML = "Enter a valid 10-digit phone number";
+          }
+        
+            
+          if (!area.value) {
+            hasErrors = true;
+            document.getElementById("areaError").innerHTML = "This field is required";
+          } else if (!area.value.match (/^[A-Za-z\s.,]+$/)) {
+            hasErrors = true;
+            document.getElementById("areaError").innerHTML = "Enter a valid area or locality";
+          }
+
+          if (!building.value) {
+            hasErrors = true;
+            document.getElementById("buildingError").innerHTML = "This field is required";
+          } else if (!building.value.match (/^[A-Za-z\s\d.]+$/)) {
+            hasErrors = true;
+            document.getElementById("buildingError").innerHTML = "Enter a valid building name";
+          }
+
+          if (!pincode.value) {
+            hasErrors = true;
+            document.getElementById("pincodeError").innerHTML = "This field is required";
+          } else if (!pincode.value.match (/^\d+$/)) {
+            hasErrors = true;
+            document.getElementById("pincodeError").innerHTML = "Enter a valid code";
+          }
+
+          if (!state.value) {
+            hasErrors = true;
+            document.getElementById("stateError").innerHTML = "This field is required";
+          } else if (!state.value.match (/^[A-Za-z\s]+$/)) {
+            hasErrors = true;
+            document.getElementById("stateError").innerHTML = "Enter a valid state";
+          }
+        
+          if (!city.value) {
+            hasErrors = true;
+            document.getElementById("cityError").innerHTML = "This field is required";
+          } else if (!city.value.match (/^[A-Za-z\s]+$/)) {
+            hasErrors = true;
+            document.getElementById("cityError").innerHTML = "Enter a valid city name";
+          }
+                    
+          if (hasErrors) {
+            event.preventDefault();
+          }
+
+        });
+    </script>
+    <script>
+      function copyCodeToClipboard(couponId) {
+          var couponCodeElement = document.getElementById('couponCode' + couponId);
+          var clipboardIcon = document.getElementById('clipboardIcon' + couponId);
+          var checkIcon = document.getElementById('checkIcon' + couponId);
+  
+          var textArea = document.createElement('textarea');
+          textArea.value = couponCodeElement.innerText;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+  
+          // Hide clipboard icon and show check icon
+          clipboardIcon.style.display = 'none';
+          checkIcon.style.display = 'inline';
+  
+          // After 3 seconds, revert to the previous state
+          setTimeout(function () {
+              clipboardIcon.style.display = 'inline';
+              checkIcon.style.display = 'none';
+          }, 3000);
+      }
+  </script>
+</body>
+</html>

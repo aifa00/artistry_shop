@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') -%>
+</head>
+
+<body>
+
+        <%- include('../partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100" style="max-width:80%;">
+                <div class="row g-4 p-4">
+
+                    <form class="forms-sample" action="/admin/edit-category/<%= categoryData._id %>?_method=PATCH" id="editCategoryForm" method="post" enctype="multipart/form-data">
+                        <h4 class="text-dark">EDIT CATEGORY</h4>
+                        <div class="form-group mt-3">
+                          <label for="category">Category name</label>
+                          <input type="text" class="form-control" id="name" style="background: transparent;" value="<%= categoryData.name %>" name="name">
+                          <span id="nameError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div>
+
+                        <!-- offer -->
+                        <div class="d-flex justify-content-between">
+                            <div class="form-group mt-3 col-md-6">
+                                <label for="offerPercentage">Offer Percentage</label>
+                                <input type="text" value="<%= categoryData.offerPercentage ? categoryData.offerPercentage : '' %>" class="form-control" id="offerPercentage" style="background: transparent;" name="offerPercentage">
+                                <span id="offerPercentageError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                            </div>
+  
+                            <div class="form-group mt-3 col-md-6 px-1">
+                                <label for="product">Offer Valid Upto</label>
+                                <input type="date" value="<%= categoryData.offerValidUpto ? categoryData.offerValidUpto.toISOString().slice(0, 10) : '' %>" class="form-control" id="offerValidUpto" style="background: transparent;" name="offerValidUpto">
+                                <span id="offerValidUptoError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                            </div>
+                          </div>
+
+                        <div class="form-group my-3">
+                          <label for="image">Image upload</label>
+                          <input type="file" accept="image/*" class="form-control" id="imageInput" name="image" style="background: transparent;">
+                        </div>
+
+                        <div class="form-group" id="previewImage" style="max-width: 300px; max-height: 300px;">
+                            <div class="card">
+                              
+                                <img src="<%= categoryData.image %>" alt="img" class="preview" id="image" style=" object-fit: cover;" />
+                            
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-1">
+                            <span class="text-primary" ><%= error %></span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary px-5 mt-2"> EDIT </button>
+                    </form>
+                      
+                </div>
+            </div>
+        
+
+            <%- include('../partials/footer') -%>
+
+        </div>          
+    </div>    
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+
+    <script>
+      const editCategoryForm = document.getElementById('editCategoryForm');
+      const name = document.getElementById('name');
+      const offerPercentage = document.getElementById('offerPercentage');
+      const offerValidUpto = document.getElementById('offerValidUpto');
+
+      editCategoryForm.addEventListener('submit', (event) => {
+
+        let hasErrors = false;
+
+        // clear previous messages
+        document.getElementById("nameError").innerHTML = "";
+        document.getElementById("offerPercentageError").innerHTML = "";
+        document.getElementById("offerValidUptoError").innerHTML = "";
+
+        if (!name.value) {
+          hasErrors = true;
+          document.getElementById("nameError").innerHTML = "This field is required";      
+        }
+
+  
+        if (offerPercentage.value && !offerValidUpto.value) {
+          hasErrors = true;
+          document.getElementById("offerValidUptoError").innerHTML = "Offer validity is required";      
+        } else if (!offerPercentage.value && offerValidUpto.value) {
+          hasErrors = true;
+          document.getElementById("offerPercentageError").innerHTML = "Offer Percentage is required";
+        }
+    
+        if ( parseInt(offerPercentage.value) < 1 || parseInt(offerPercentage.value) > 100) {
+          hasErrors = true;
+          document.getElementById("offerPercentageError").innerHTML = "Percentage should be between 1 - 100%";
+        } else if (offerPercentage.value && !offerPercentage.value.match(/^\d+$/)) {
+          hasErrors = true;
+          document.getElementById("offerPercentageError").innerHTML = "Please enter a valid percentage";
+        }
+
+        const currentDate = new Date();
+        const enteredDate = new Date(offerValidUpto.value);
+
+        if (enteredDate < currentDate) {
+          hasErrors = true;
+          document.getElementById("offerValidUptoError").innerHTML = "Valid upto can't be less than current date";
+        }
+
+
+        if (hasErrors) {
+          event.preventDefault();
+        }
+
+      });
+    
+    </script>
+    <script>
+        const previewImage = document.getElementById('previewImage');  
+        const imageInput = document.getElementById('imageInput');      
+        const image = document.getElementById('image');
+
+        imageInput.onchange = e => {
+          if (e.target.files && e.target.files.length) {
+            const newImageSrc = URL.createObjectURL(e.target.files[0]);            
+            image.src = newImageSrc;
+          }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head') -%>
+    <style>
+      .row label{
+          font-size: 13px;
+          font-weight: 600;
+      }
+  </style>
+</head>
+
+<body>
+
+        <%- include('../partials/header') -%>
+
+            <div class="container-fluid pt-4 px-4 vh-100" style="max-width:80%;">
+                <div class="row g-4 p-4">
+
+                    <form class="forms-sample" id="addProduct-form" action="/admin/add-product" method="post" enctype="multipart/form-data">
+                        <h4 class="text-dark">ADD PRODUCT</h4>
+
+                        <div class="form-group my-2">
+                          <label for="product">Product Name</label>
+                          <input type="text" class="form-control" id="product" style="background: transparent;" name="title">
+                          <span id="productError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div>
+
+                        <!-- select category -->
+                        <div class="form-group my-2">
+                            <label for="product">Category</label>
+
+                            <select class="form-control" id="selectCategory" style="background: transparent;" name="category">
+                                <option value="">Select Category</option>
+                                <% foundCategories.forEach(category=> { %>
+                                    <option value="<%= category._id %>"><%= category.name %></option>
+                                <% }) %>
+                            </select>
+                            <span class="text-primary" id="categoryError" style="font-weight: 700;font-size: 13px;"></span>
+                        </div>
+
+                        <div class="form-group my-2 ">
+                            <label for="product">Artist</label>
+                            <input type="text" class="form-control" id="artist" style="background: transparent;" name="artist">
+                            <span id="artistError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div>
+
+                        <div class="form-group my-2 ">
+                            <label for="product">Description</label>
+                            <input type="text" class="form-control" id="description" style="background: transparent;" name="description">
+                            <span id="descriptionError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                        </div>
+
+                        <!-- price, stock, color -->
+                        <div class="d-flex justify-content-between">
+                            <div class="form-group my-1 col-md-4">
+                                <label for="product">Price</label>
+                                <input type="text" class="form-control" id="price" style="background: transparent;" name="price">
+                                <span id="priceError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                            </div>
+
+                            <div class="form-group my-1 col-md-4 px-1 ">
+                                <label for="product">Stock</label>
+                                <input type="text" class="form-control" id="stock" style="background: transparent;" name="stock">
+                                <span class="text-primary" id="stockError" style="font-weight: 700;font-size: 13px;" ></span>
+                            </div>
+    
+                            <div class="form-group my-1 col-md-4">
+                                <label for="product">Color</label>                               
+                                <select name="color" class="form-control" id="color" style="background: transparent;" name="color"  >
+                                  <option value="" selected>Select Color</option>
+                                  <option value="Red">Red</option>
+                                  <option value="Yellow">Yellow</option>
+                                  <option value="Blue">Blue</option>
+                                  <option value="Grey">Grey</option>
+                                  <option value="Green">Green</option>
+                                  <option value="Pink">Pink</option>
+                                  <option value="White">White</option>
+                                  <option value="Orange">Orange</option>
+                                </select>
+                                <span class="text-primary" id="colorError" style="font-weight: 700;font-size: 13px;"></span>
+                            </div>
+                        </div>
+
+                        <!-- offer -->
+                        <div class="d-flex justify-content-between">
+                          <div class="form-group my-1 col-md-6">
+                              <label for="offerPercentage">Offer Percentage</label>
+                              <input type="text" class="form-control" id="offerPercentage" style="background: transparent;" name="offerPercentage">
+                              <span id="offerPercentageError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                          </div>
+
+                          <div class="form-group my-1 col-md-6 px-1 ">
+                              <label for="product">Offer Valid Upto</label>
+                              <input type="date" class="form-control" id="offerValidUpto" style="background: transparent;" name="offerValidUpto">
+                              <span id="offerValidUptoError" style="font-weight: 700;font-size: 13px;" class="text-primary"></span>
+                          </div>                            
+                        </div>
+
+                        <!-- product image -->
+                        <div class="form-group mb-3">
+                          <label for="image">Product Images</label>
+                          <input type="file" multiple accept="image/*"  class="form-control file-upload-info productImages" id="product-images" name="images" style="background: transparent;">
+                          <span class="text-primary" id="imageInputError" style="font-weight: 700;font-size: 13px;" ></span>
+                        </div>
+
+                        <div class="form-group">
+                          <span class="text-primary" id="error" style="font-weight: 700;font-size: 13px;" ><%= error %></span>
+                        </div>
+
+                        
+                        <button type="submit" class="btn btn-primary px-5 mt-2"> ADD </button>
+                    </form>
+                      
+                </div>
+            </div>
+        
+
+            <%- include('../partials/footer') -%>
+
+
+        </div>
+        
+    </div>
+    
+<script>
+
+const form = document.getElementById('addProduct-form');
+const product = document.getElementById('product');
+const category = document.getElementById('selectCategory');
+const artist = document.getElementById('artist');
+const description = document.getElementById('description');
+const price = document.getElementById('price');
+const stock = document.getElementById('stock');
+const color = document.getElementById('color');
+const offerPercentage = document.getElementById('offerPercentage');
+const offerValidUpto = document.getElementById('offerValidUpto');
+const fileInput = document.getElementById('product-images');
+
+form.addEventListener('submit', (event) => {
+
+
+  // set has errors false by default
+  let hasErrors = false;
+
+  // clear previous messages
+  document.getElementById("error").innerHTML = "";
+  document.getElementById("productError").innerHTML = "";
+  document.getElementById("categoryError").innerHTML = "";
+  document.getElementById("artistError").innerHTML = "";
+  document.getElementById("descriptionError").innerHTML = "";
+  document.getElementById("priceError").innerHTML = "";
+  document.getElementById("stockError").innerHTML = "";
+  document.getElementById("colorError").innerHTML = "";
+  document.getElementById("imageInputError").innerHTML = "";
+  document.getElementById("offerPercentageError").innerHTML = "";
+  document.getElementById("offerValidUptoError").innerHTML = "";
+
+
+    if(!product.value) {
+      hasErrors = true;
+      document.getElementById("productError").innerHTML = "This field is required";
+    } else if (!product.value.match(/^[A-Za-z0-9\s]+$/)) {
+      hasErrors = true;
+      document.getElementById("productError").innerHTML = "Product name must not contain special characters";
+    } else if(product.value.length < 3 || product.value.length > 60){
+      hasErrors = true;
+      document.getElementById('productError').innerHTML = "Product name should be between three to sixty characters"
+    }
+
+    if (!description.value) {
+      hasErrors = true;
+      document.getElementById('descriptionError').innerHTML = "This field is required"
+    } else if (description.value.length < 5 || description.value.length > 200){
+      hasErrors = true;
+      document.getElementById('descriptionError').innerHTML = "Description should be between five to two hundred cahracters";
+    } else if (product.value == description.value) {
+      hasErrors = true;
+      document.getElementById("descriptionError").innerHTML = "Product name and description can't be same";
+    }
+
+    if (!price.value) {
+      hasErrors = true;
+      document.getElementById("priceError").innerHTML = "This field is required";
+    }else if (!price.value.match(/^\d+$/) || parseInt(price.value) <= 0) {
+      hasErrors = true;
+      document.getElementById("priceError").innerHTML = "Please enter a valid price";
+    }
+    
+    if (!artist.value) {
+      hasErrors = true;
+      document.getElementById("artistError").innerHTML = "This field is required";
+    } else if (!artist.value.match(/^[A-Za-z\s]+$/)) {
+      hasErrors = true;
+      document.getElementById("artistError").innerHTML = "Enter a valid artist name";
+    } else if (artist.value.length < 3 || artist.value.length > 20){
+      hasErrors = true;
+      document.getElementById('artistError').innerHTML = "Artist name should be between three to twenty characters"
+    }
+    
+    if(!stock.value) {
+      hasErrors = true;
+      document.getElementById("stockError").innerHTML = "This field is required";
+    } else if (!stock.value.match(/^\d+$/) || parseInt(stock.value) <= 0) {
+      hasErrors = true;
+      document.getElementById("stockError").innerHTML = "Please enter a valid stock number";
+    }
+
+    if (!category.value) {
+      hasErrors = true;
+      document.getElementById("categoryError").innerHTML = "This filed is required";
+    }
+    
+    if (!color.value) {
+      hasErrors = true;
+      document.getElementById("colorError").innerHTML = "This field is required";
+    }
+    if (!fileInput.value) {
+      hasErrors = true;
+      document.getElementById("imageInputError").innerHTML = "This field is required";
+      
+    }
+
+    if (offerPercentage.value && !offerValidUpto.value) {
+      hasErrors = true;
+      document.getElementById("offerValidUptoError").innerHTML = "Offer validity is required";      
+    } else if (!offerPercentage.value && offerValidUpto.value) {
+      hasErrors = true;
+      document.getElementById("offerPercentageError").innerHTML = "Offer Percentage is required";
+    }
+    
+    if ( parseInt(offerPercentage.value) < 1 || parseInt(offerPercentage.value) > 100) {
+      hasErrors = true;
+      document.getElementById("offerPercentageError").innerHTML = "Percentage should be between 1 - 100%";
+    } else if (offerPercentage.value && !offerPercentage.value.match(/^\d+$/)) {
+      hasErrors = true;
+      document.getElementById("offerPercentageError").innerHTML = "Please enter a valid percentage";
+    }
+
+    const currentDate = new Date();
+    const enteredDate = new Date(offerValidUpto.value);
+
+    if (enteredDate < currentDate) {
+      hasErrors = true;
+      document.getElementById("offerValidUptoError").innerHTML = "Valid upto can't be less than current date";
+    }
+    
+  // prevent submission if has error is true
+  if (hasErrors) {
+    event.preventDefault();
+  }
+
+});
+
+    
+
+            //image upload 
+             
+
+            fileInput.addEventListener('change', function(event) {
+
+              if (fileInput.files.length > 3) {
+                hasErrors = true;
+                fileInput.value = ''; 
+                document.getElementById("imageInputError").innerHTML = "You can only select up to three images.";
+              } else if (fileInput.files.length < 3) {
+                hasErrors = true;
+                fileInput.value = ''; 
+                document.getElementById("imageInputError").innerHTML = "Please upload atleast three product images";
+              } else if (fileInput.files.length === 3) {
+                document.getElementById("imageInputError").innerHTML = "";
+                
+              }
+                       
+
+            });
+            
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/lib/chart/chart.min.js"></script>
+    <script src="/admin/lib/easing/easing.min.js"></script>
+    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="/admin/js/main.js"></script>
+</body>
+
+</html>
