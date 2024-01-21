@@ -14,7 +14,7 @@
             <div class="intro-slider-container mb-0">
                 <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{"nav": false, "dots": false}'>
 
-
+                <% if (heroBanners.length) { %>
                     <div class="intro-slide" style="background-image: url('<%= heroBanners[0].images[0] %>');">
                         <div class="container intro-content text-center" style="margin-top: 22rem;" >
                             <h3 class="intro-subtitle text-white"><%= heroBanners[0].description %></h3><!-- End .h3 intro-subtitle -->
@@ -34,6 +34,7 @@
                             <a href="<%= heroBanners[1].url %>" class="btn btn-primary">Shop NOW</a>
                         </div>
                     </div>
+                <% } %>                       
 
                 </div>
 
@@ -68,6 +69,7 @@
                 <div class="banner-group">
                     <div class="row">
                     
+                    <% if (featuredBanners.length) { %>
                         <div class="col-md-6">
                             <div class="banner banner-border-hover">
                                 <a href="<%= featuredBanners[0].url %>">
@@ -79,7 +81,7 @@
                                     <h3 class="banner-title"><a href="#"><span><%= featuredBanners[0].title %></span></a></h3>
                                     <a href="<%= featuredBanners[0].url %>" class="btn btn-outline-primary-2 banner-link">Shop Now<i class="icon-long-arrow-right"></i></a>
                                 </div>
-                            </div>                            
+                            </div>   
                         </div>
                         
 
@@ -96,6 +98,7 @@
                                 </div>
                             </div>
                         </div>
+                    <% } %>
 
                     </div><!-- End .row -->
                 </div><!-- End .banner-group -->

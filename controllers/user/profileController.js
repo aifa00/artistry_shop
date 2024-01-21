@@ -37,7 +37,7 @@ export const getProfile = async (req, res, next) => {
 
 //generate refferal link
 const generateReferralLink = (referralCode) => {
-    return `http://localhost:5000/register?ref=${referralCode}`;
+    return `art-istry.shop/register?ref=${referralCode}`;
 };
 
 
