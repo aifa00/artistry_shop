@@ -14,8 +14,8 @@ export const sendToMail = (req, res, userId, isForgotPassword, next) => {
     const transporter = nodeMailer.createTransport({
         service: 'Gmail',
         host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
+        port: 465,
+        secure: true,
         auth: {
             user: process.env.USER,
             pass: process.env.APP_PASSWORD
@@ -39,8 +39,7 @@ export const sendToMail = (req, res, userId, isForgotPassword, next) => {
     const mailOptions = {
         from: {
             name: "Artistry",
-            address: process.env.USER,
-            
+            address: process.env.USER,            
         },
         to: req.body.email,
         subject: 'OTP Verification',

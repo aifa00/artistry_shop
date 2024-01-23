@@ -41,7 +41,7 @@
                                        
                                             <div class="col-lg-12 p-4 border mb-3">
 
-                                                <div style="display: flex;justify-content: space-between; align-items: center;" >
+                                                <div class="d-flex flex-column">
                                                   
                                                     <div class="d-flex" >
 
@@ -73,9 +73,9 @@
                                                             </p>
                                                         </div>                                                        
                                                     </div>
-                                                <div>
                                                     
-                                                    
+                                                    <div class="mt-1">
+                                                                          
                                                     <% if (order.products.status === 'Cancelled') { %>                        
                                                         <strong class="text-danger">CANCELLED</strong>
                                                     
@@ -87,7 +87,7 @@
                                                         <form action="/cancel-order" method="post" id="<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>" >
                                                           <input type="hidden" name="orderId" value="<%= order._id %>">
                                                           <input type="hidden" name="productId" value="<%= order.orderedProducts[0]._id %>">
-                                                          <button type="button" class="btn btn-outline-primary mb-3" onclick="openCancelOrderModal('<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>')">
+                                                          <button type="button" class="btn btn-block btn-outline-primary" onclick="openCancelOrderModal('<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>')">
                                                             CANCEL ORDER
                                                           </button>
                                                         </form>
@@ -118,11 +118,11 @@
 
                                                         <% } else if (order.products.returnRequested === "Completed") { %>
                                                         
-                                                            <strong class="text-uppercase ">Returned</strong>
+                                                            <strong class="text-uppercase">Returned</strong>
 
                                                         <% } else if (currentDate <= sevenDaysAfterDelivery) { %>
                                                 
-                                                        <button type="button" class="btn btn-sm btn-primary mb-3" data-toggle="modal" data-target="#returnModal<%= order.products.product %>">
+                                                        <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#returnModal<%= order.products.product %>">
                                                             Return
                                                         </button>
 

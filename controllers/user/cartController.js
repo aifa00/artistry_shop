@@ -609,13 +609,13 @@ export const cancelOrder = async (req, res, next) => {
         await foundOrder.save();
 
 
-
-
         //find amt to refund
         const productCancelled = await Product.findById(req.body.productId).populate('category');             
         
 
-        if (foundOrder.paymentMethod !== 'cod') {                        
+        console.log('its before if consition',foundOrder.paymentMethod );
+        if (foundOrder.paymentMethod !== 'cod') {            
+            console.log('its after if consition',foundOrder.paymentMethod );         
     
             let offerPercentage = 0;
             let amountToRefund = 0; 

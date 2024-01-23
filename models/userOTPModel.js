@@ -21,7 +21,7 @@ const userOTPVerificationSchema = new mongoose.Schema({
 userOTPVerificationSchema.pre('save', function (next) {
     const createdAt = this.createdAt;
     const expiresAt = new Date(createdAt);
-    expiresAt.setMinutes(expiresAt.getMinutes() + 2);
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5);
     this.expiresAt = expiresAt;
 
     next();

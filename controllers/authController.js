@@ -261,7 +261,10 @@ export const changePassword = async (req, res) => {
 
         await User.updateOne({ _id: req.session.user }, { $set: { password: hashedPassword } });
 
-        req.session.message = 'Your password changed successfully !';
+        req.session.message = {
+            type: 'danger',
+            message: 'Your password changed successfully !',
+        }
 
         res.redirect("/profile");
 

@@ -14,7 +14,7 @@
             <div class="intro-slider-container mb-0">
                 <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{"nav": false, "dots": false}'>
 
-                <% if (heroBanners.length) { %>
+                <% if (heroBanners[0]) { %>
                     <div class="intro-slide" style="background-image: url('<%= heroBanners[0].images[0] %>');">
                         <div class="container intro-content text-center" style="margin-top: 22rem;" >
                             <h3 class="intro-subtitle text-white"><%= heroBanners[0].description %></h3><!-- End .h3 intro-subtitle -->
@@ -23,8 +23,9 @@
                             <a href="<%= heroBanners[0].url %>" class="btn btn-primary">Discover NOW</a>
                         </div><!-- End .intro-content -->
                     </div><!-- End .intro-slide -->
+                <% } %>
 
-
+                <% if (heroBanners[1]) { %>
                     <div class="intro-slide" style="background-image: url('<%= heroBanners[1].images[0] %>');">
                         <div class="container intro-content text-center" style="margin-bottom: 10rem;" >
                             
@@ -69,7 +70,7 @@
                 <div class="banner-group">
                     <div class="row">
                     
-                    <% if (featuredBanners.length) { %>
+                    <% if (featuredBanners.length === 2) { %>
                         <div class="col-md-6">
                             <div class="banner banner-border-hover">
                                 <a href="<%= featuredBanners[0].url %>">
@@ -511,7 +512,7 @@
 
                                         <div class="product-body">
                                             <div class="product-cat">
-                                                <a href="#">Clothing</a>
+                                                <a href="#"><%= product.category.name %></a>
                                             </div><!-- End .product-cat -->
                                             <h3 class="product-title"><a href="/product/<%= product._id %>"><%= product.title %></a></h3><!-- End .product-title -->
                                             <div class="product-price">

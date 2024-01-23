@@ -36,7 +36,7 @@
                             
 
                             <!-- div left -->
-                            <div class="col-md-6">       
+                            <div class="col-md-6 p-3">       
                             
                                 <div class="d-flex justify-content-between align-items-center border p-3">
                                     <div>
@@ -92,7 +92,7 @@
                                         </span>
                                     </div>
 
-                                    <div class="mt-1">                                                                                   
+                                    <div class="mt-1 mb-2">                                                                                   
                                         <i class="bi bi-check-circle-fill <%= foundOrder.products.status === 'Delivered' ? 'text-success' : 'text-light' %>"></i>
                                         <span style="margin-left: 3rem;" >
                                         Delivery, <%= foundOrder.deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
@@ -107,7 +107,7 @@
                             </div>
 
                             <!-- div right -->
-                            <div class="col-md-6" style="padding-left: 10rem;" >
+                            <div class="col-md-6 p-3" >
                                 <div  class="mb-4">
                                     <span class="text-primary text-uppercase">Shipping Details</span>
                                     <p>

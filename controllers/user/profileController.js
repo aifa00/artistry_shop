@@ -37,7 +37,7 @@ export const getProfile = async (req, res, next) => {
 
 //generate refferal link
 const generateReferralLink = (referralCode) => {
-    return `art-istry.shop/register?ref=${referralCode}`;
+    return `https://art-istry.shop/register?ref=${referralCode}`;
 };
 
 
@@ -60,26 +60,23 @@ export const updateProfile = async (req, res, next) => {
             const currentUser = await User.findById (req.session.user);//inorder to check if any other user otherthan this exist
             
             const userWithSameEmail = await User.findOne ({_id: { $ne: currentUser._id }, email});
-            if (userWithSameEmail) {
-                res.render ('user/profile', {
-                isLoggedIn: isLoggedIn (req, res),
-                currentUser: await getCurrentUser (req, res),
-                error: 'User with this email already exist',
-                address,
-                message: '',
-                });
-                return;
+            if (userWithSameEmail) {                
+                req.session.message = {
+                    type: 'danger',
+                    message: 'User with this email already exist',
+                }
+
+                return res.redirect ('/profile');
             }
             const userWithSamePhone = await User.findOne ({_id: { $ne: currentUser._id }, phone});
             if (userWithSamePhone) {
-                res.render ('user/profile', {
-                isLoggedIn: isLoggedIn (req, res),
-                currentUser: await getCurrentUser (req, res),
-                error: 'User with this number already exist',
-                address,
-                message: '',
-                });
-                return;
+
+                req.session.message = {
+                    type: 'danger',
+                    message: 'User with this number already exist',
+                }
+
+                return res.redirect ('/profile');
             }
 
             //manage updation
@@ -318,7 +315,7 @@ export const editAddress = async (req, res, next) => {
 
 
 
-//get cahnge address
+//get cahange address
 export const getChangeAddress = async (req, res, next) => {
     try {
         const foundAddress = await Address.find({ user: req.session.user });

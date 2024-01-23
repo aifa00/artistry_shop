@@ -31,17 +31,17 @@
 	                	<div class="row">
                             <% if (!isLoggedIn) { %>
 
-                                <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 70vh;">
+                                <div class="container-fluid d-flex flex-column align-items-center justify-content-center text-center" style="height: 70vh;">
                                     <img src="https://en.mer.vn/public/theme/imgs/shop/empty-cart.svg" alt="img" height="200rem" width="200rem">
                                     <p>Your cart is empty.please <span style="font-size:x-large;" ><a href="/login">LOGIN</a></span> to continue</p>
                                 </div>
                 
                             <% } else { %>
                                 <% if (!cartProducts.length) { %>
-                                    <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 60vh;">
+                                    <div class="container-fluid d-flex flex-column align-items-center justify-content-center text-center" style="height: 60vh;">
                                         <img src="https://en.mer.vn/public/theme/imgs/shop/empty-cart.svg" alt="img" height="200rem" width="200rem">
                                         <p>There is nothing in your cart. Let's add something</p>
-                                        <a href="/shop" class="btn btn-primary" style="color: white;" >Continue Shopping</a>
+                                        <a href="/shop" class="btn btn-primary" style="color: white;">Continue Shopping</a>
                                     </div>
                                 <% } else { %>
 
@@ -224,7 +224,7 @@
 	                					</tbody>
 	                				</table>
 
-	                				<a href="/checkout" class="btn btn-outline-primary-2 btn-order btn-block " id="checkoutBtn" >PROCEED TO CHECKOUT</a>
+	                				<a href="/checkout" class="btn btn-outline-primary-2 btn-order btn-block " id="checkoutBtn">PROCEED TO CHECKOUT</a>
 	                			</div>
 
 		            			<a href="/shop" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
