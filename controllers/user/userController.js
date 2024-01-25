@@ -8,6 +8,7 @@ import razorpay from "../../utils/razorpayConfig.js"
 import User from "../../models/userModel.js";
 import Banner from "../../models/bannerModel.js";
 import Return from "../../models/returnModel.js";
+import logger from "../../utils/logger.js";
 
 //get home
 export const getHome = async (req, res, next) => {
@@ -203,6 +204,30 @@ export const getShop = async (req, res, next) => {
         }
     }
 
+
+
+//add to wishlist
+export const addToWishlist = async (req, res, next) => {
+    try {
+        const { product } = req.body;        
+
+        const currentUser = await getCurrentUser(req, res);
+        
+        currentUser.wishlist.push(product);
+
+        await currentUser.save();
+
+        req.session.message = {
+            type :'success',
+            message: 'Item added to wishlist!',
+        }
+        
+        res.status(200).json({success: true});
+
+    } catch (error) {
+        next(error);
+    }
+};
 
 //get single product
 export const getProduct = async (req, res, next) => {
@@ -424,7 +449,7 @@ export const placeOrder = async (req, res, next) => {
 
 
         } else {
-            console.log('No payment selected');
+            logger.info('no payment selected');
         }
 
 

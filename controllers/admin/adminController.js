@@ -5,6 +5,7 @@ import Coupon from "../../models/couponModel.js";
 import Return from "../../models/returnModel.js";
 import PDFDocument from 'pdfkit';
 import ExcelJS from 'exceljs';
+import logger from "../../utils/logger.js";
 
 
 
@@ -779,8 +780,8 @@ export const downloadSalesReport = async (req, res, next) => {
             await workbook.xlsx.write(res);
             res.end();
  
-        } else {
-            console.log('Invalid format specified');
+        } else {            
+            logger.info('Invalid format specified');
         }
 
         

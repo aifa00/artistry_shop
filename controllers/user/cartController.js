@@ -612,10 +612,8 @@ export const cancelOrder = async (req, res, next) => {
         //find amt to refund
         const productCancelled = await Product.findById(req.body.productId).populate('category');             
         
-
-        console.log('its before if consition',foundOrder.paymentMethod );
-        if (foundOrder.paymentMethod !== 'cod') {            
-            console.log('its after if consition',foundOrder.paymentMethod );         
+       
+        if (foundOrder.paymentMethod !== 'cod') {                        
     
             let offerPercentage = 0;
             let amountToRefund = 0; 
@@ -635,24 +633,15 @@ export const cancelOrder = async (req, res, next) => {
                 const discountedPrice = productCancelled.price - ((offerPercentage/100) * productCancelled.price);
                 amountToRefund = discountedPrice * cancellingProductQty;            
             } else {
-                amountToRefund = productCancelled.price * cancellingProductQty;
-    
-                console.log('productCancelled.price: ',productCancelled.price);
-                console.log('amt to refund: ',amountToRefund);
+                amountToRefund = productCancelled.price * cancellingProductQty;    
             }
             
             
             if(foundOrder.products.length === 1) {
                 amountToRefund += 20
-    
-                console.log('its last product: ',amountToRefund);
-                
-                console.log('foundOrder.couponApplied: ',foundOrder.couponApplied);
-                console.log('foundOrder.couponApplied.discount: ',foundOrder.couponApplied.discount);
-    
+                                  
                 if (foundOrder.couponApplied.discount !== undefined) {
-                    amountToRefund -= foundOrder.couponApplied.discount;
-                    console.log('whether coupon applied: ',amountToRefund);
+                    amountToRefund -= foundOrder.couponApplied.discount;                   
                 }
             }
     

@@ -4,6 +4,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { dirname } from 'path';
+import logger from "../../utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -268,7 +269,12 @@ export const deleteSingleImage = async (req, res, next) => {
         await Product.findByIdAndUpdate(req.params.id, { $pull: { images: image } }, { new: true });
 
         fs.unlink(path.join(__dirname, '../../public', image), (error) => {
-            if (error) console.log(error);
+            if (error) {
+                logger.log({
+                    level: 'error',
+                    message: error
+                });
+            }
         });
 
         res.redirect(`/admin/edit-product/${req.params.id}`);

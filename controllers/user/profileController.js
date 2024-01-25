@@ -7,6 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { dirname } from 'path';
+import logger from "../../utils/logger.js";
 
 
 
@@ -90,7 +91,10 @@ export const updateProfile = async (req, res, next) => {
                 if (currentUser.profile) {
                     fs.unlink(path.join(__dirname, "../../public", currentUser.profile), (err) => {
                         if (err) {
-                            console.error(err);
+                            logger.log({
+                                level: 'error',
+                                message: err,
+                            });
                         }
                     });
                 }
@@ -132,7 +136,10 @@ export const removeProfileImage = async (req, res, next) => {
         if (currentUser.profile) {
             fs.unlink(path.join(__dirname, "../../public", currentUser.profile), (err) => {
                 if (err) {
-                    console.error(err);
+                    logger.log({
+                        level: 'error',
+                        message: err,
+                    });
                 }
             });
         }

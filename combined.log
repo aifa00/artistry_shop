@@ -1,0 +1,35 @@
+{"level":"info","message":"db connected","service":"user-service"}
+{"level":"info","message":"db connected","service":"user-service"}
+{"level":"info","message":"db connected","service":"user-service"}
+{"level":"error","message":"db connection error MongooseError: The `uri` parameter to `openUri()` must be a string, got \"undefined\". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.","service":"user-service"}
+{"level":"error","message":"db connection error MongooseError: The `uri` parameter to `openUri()` must be a string, got \"undefined\". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.","service":"user-service"}
+{"level":"info","message":"db connected successfully","service":"user-service"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"user-service"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"user-service"}
+{"level":"info","message":"db connected successfully","service":"user-service"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"`server is running at http://localhost:${PORT}`","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+info: `server is running at http://localhost:${PORT}` {"service":"artistry"}
+info: db connected successfully {"service":"artistry"}
+info: server is running at http://localhost:5000 {"service":"artistry"}
+info: db connected successfully {"service":"artistry"}
+{"level":"info","message":"server is running at http://localhost:5000","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}
+{"level":"info","message":"server is running at http://localhost:5000","service":"artistry"}
+{"level":"info","message":"db connected successfully","service":"artistry"}

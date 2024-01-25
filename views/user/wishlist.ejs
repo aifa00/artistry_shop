@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/category.html  22 Nov 2019 10:02:48 GMT -->
+<head>
+    <%- include('./partials/head') %>
+</head>
+
+<body>
+    <div class="page-wrapper">
+       <%- include('./partials/header')  %>
+        <main class="main">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+                <div class="container d-flex align-items-center">
+                    <div class="col-md-6">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Shop</li>                                        
+                        </ol>
+                    </div>
+                    <div class="col-md-6">
+                    <form id="searchForm">
+                        <div class="header-search d-flex align-items-center justify-content-center align-items-center">
+                                                  
+                            <div>
+                                <label for="q" class="sr-only">Search</label>
+                                <input type="search" value="<%= typeof(search) !== undefined ? search : '' %>" class="form-control"  id="search" name="search" placeholder="Search in..." >
+                            </div>
+                            
+                            <button class="btn" type="submit" style="border: none;"><i class="icon-search "></i></button>                        
+                          
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </nav>
+
+
+            <div class="page-content">
+                <div class="container">
+                	<div class="row">
+                		<div class="col-lg-9">
+                			<div class="toolbox">
+                				<div class="toolbox-left">
+                					<div class="toolbox-info">
+                						
+                					</div>
+                				</div>
+
+                				<div class="toolbox-right">
+                					<div class="toolbox-sort">
+                						<label for="sortby">Sort by:</label>
+                						<div class="select-custom">
+											
+                                                <select name="sort" id="sort" class="form-control">
+                                                    <option value="">Recommended</option>
+                                                    <option value="low-to-high" <%= sort === 'low-to-high' ? 'selected' : '' %>>Price - Low to High</option>
+                                                    <option value="high-to-low" <%= sort === 'high-to-low' ? 'selected' : '' %>>Price - High to low</option>
+                                                </select>
+                                                                                            
+										</div>
+                					</div><!-- End .toolbox-sort -->
+                				</div><!-- End .toolbox-right -->
+                			</div><!-- End .toolbox -->
+
+                            <div class="products mb-3">
+                                <div class="row justify-content-center">
+                                    <% if(!foundProducts.length) { %>
+                                        <h5>NO PRODUCTS FOUND</h5>
+                                    <% }else{ %>
+                                        <% foundProducts.forEach((product) => { %>
+                                            <% if(product.category.disabled === false) { %>
+
+                                                <div class="col-12 col-md-6 col-lg-6">
+                                                    <div class="product product-7 text-center">
+
+                                                        <figure class="product-media">
+                                                            
+                                                            <a href="/product/<%= product._id %>">
+                                                                <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
+                                                            </a>                                                            
+                                                            
+                                                            <form class="addToCartForm" action="/add-to-cart" method="post">
+                                                            <div class="product-action">
+                                                                <% if(!product.stock) { %>
+                                                                    <a href="#" class="btn-product"><span>Currently Unavailable</span></a>                                      
+                                                                <% } else { %>
+                                                                    <% if (isLoggedIn) { %>
+                                                                        <% if (currentUser && currentUser.cart.some(item => item.product.toString() === product._id.toString() )) { %>
+                                                                            <a href="/cart" class="btn-product btn-cart"><span>Go To Cart</span></a>
+                                                                        <% } else { %>
+                                                                            <input type="hidden" name="product" value="<%= product._id %>">
+                                                                            <input type="hidden" name="fixedQuantity" value="1"> 
+                                                                            <input type="hidden" name="from" value="shop">
+                                                                            <button type="submit" class="btn btn-product btn-cart" id="addToCartBtn<%= product._id %>" >
+                                                                                <span>Add To Cart</span>
+                                                                            </button>
+                                                                        <% } %>   
+                                                                    <% } else { %>
+                                                                        <a href="/login" class="btn-product btn-cart"><span>Add To Cart</span></a>
+                                                                    <% } %>                                                                      
+                                                                <% } %>
+                                                            </div>
+                                                            </form>
+
+                                                        </figure>
+        
+                                                        <div class="product-body text-center">
+                                                            <div class="product-cat">
+                                                                <a href="#"><%= product.category.name %></a>
+                                                            </div>
+
+                                                            <h3 class="product-title mb-1" style="font-size: 1.8rem; font-weight: 400;"><a href="/product/<%= product._id %>"><%= product.title %></a></h3><!-- End .product-title -->
+
+                                                            <%  if(!product.stock) { %>
+                                                                <div  style="display: inline-block;">
+                                                                    <p class="text-danger">Currently Unavailable</p>
+                                                                </div>
+
+                                                            <% } else { %>
+
+                                                                <div>
+                                                                    <% let discountPercentage = 0; %>
+                                                                    <% const currentDate = new Date() %>
+                            
+                                                                    <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>   
+                                                                        <% discountPercentage += product.offerPercentage %>
+                                                                    <% } %> 
+                            
+                                                                    <% if (product.category.isOfferActive && currentDate <= product.category.offerValidUpto) { %>   
+                                                                        <% discountPercentage += product.category.offerPercentage %>
+                                                                    <% } %> 
+                            
+                                                                    <% if (discountPercentage > 90) { %>
+                                                                        <% discountPercentage = 90 %>
+                                                                    <% } %>
+                            
+                            
+                                                                    <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
+                                                                        <% const discountedPrice = product.price - (discountPercentage/100) * product.price %>  
+                                                                        <h6>
+                                                                            <span>&#8377; <%= discountedPrice %></span>
+                                                                            <small style="text-decoration: line-through;color:#999;">&#8377; <%= product.price %></small>
+                                                                            <small class="text-success">(<%= discountPercentage %>% OFF)</small>
+                                                                        </h6>                                
+                                                                        
+                            
+                                                                    <% } else { %>
+                                                                        <h6>&#8377; <%= product.price %></h6>
+                                                                    <% } %> 
+                                                                    
+                                                                </div>
+
+                                                            <% } %>
+                                                                                                                                                                
+                                                        </div>                                                        
+                                                    </div>
+                                                </div>
+                                            <% } %>
+                                        <% }) %>
+                                    <% } %>                            
+                                </div><!-- End .row -->
+                            </div><!-- End .products -->
+
+                            
+                            
+                		</div>
+
+                		
+                	</div>
+                </div>
+            </div>
+        </main>
+        <%- include('./partials/footer') -%>
+    </div><!-- End .page-wrapper -->
+
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div>
+    <%- include('./partials/mobileMenu') -%>
+
+    
+
+    <script src="/user/js/jquery.min.js"></script>
+    <script src="/user/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/js/jquery.waypoints.min.js"></script>
+    <script src="/user/js/superfish.min.js"></script>
+    <script src="/user/js/owl.carousel.min.js"></script>
+    <script src="/user/js/wNumb.js"></script>
+    <script src="/user/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/js/jquery.magnific-popup.min.js"></script>
+    <script src="/user/js/nouislider.min.js"></script>
+    <script src="/user/js/main.js"></script>
+
+    
+   
+    <script>
+
+    $(document).ready(function() {
+        // Handle the form submission with AJAX
+        $('.addToCartForm').submit(function(event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Collect form data
+            var formData = $(this).serialize();
+            console.log(formData);
+
+            // Make an AJAX request
+            $.ajax({
+                url: '/add-to-wishlist',
+                type: 'POST',
+                dataType: 'json',
+                data: formData,
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+
+    </script>
+
+    
+    <script>
+    $(document).ready(function() {
+    $('.page-item').click(function(){
+        const clickedButton = this;
+        const pageNo = clickedButton.dataset.pageNo;
+
+        // Get the current URL
+        const url = new URL(window.location.href);
+
+        // Check if the "param1" query parameter exists
+        if (url.searchParams.has('page') && pageNo !== undefined) {
+        // Update the value of "param1"
+        url.searchParams.set('page', pageNo);
+        } else if(pageNo !== undefined){
+        // Add the "param1" query parameter
+        url.searchParams.append('page', pageNo);
+        }
+
+        window.location.href = url;
+    });
+    });
+ </script>
+
+
+
+</body>
+</html>

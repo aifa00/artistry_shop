@@ -3,7 +3,8 @@ import sharp from 'sharp';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { v4 } from 'uuid'
+import { v4 } from 'uuid';
+import logger from '../utils/logger.js';
 
 
 //find the directory of the current module file
@@ -112,7 +113,12 @@ export const resizeProfileImage = async (req, res, next) => {
         next();
 
     } catch (error) {
-        console.log(error);
+        
+        logger.log({
+            level: 'error',
+            message: error,
+        });
+
     }
 }
 

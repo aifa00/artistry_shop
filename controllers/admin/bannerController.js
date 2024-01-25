@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import Banner from '../../models/bannerModel.js';
+import logger from '../../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -148,7 +149,12 @@ export const deleteBannerImage = async (req, res, next) => {
         await Banner.findByIdAndUpdate(req.params.id, { $pull: { images: image } }, { new: true });
 
         fs.unlink(path.join(__dirname, '../../public', image), (error) => {
-            if (error) console.log(error);
+            if (error) {
+                logger.log({
+                    level: 'error',
+                    message: error,
+                });
+            }
         });
 
         res.redirect(`/admin/edit-banner/${req.params.id}`);

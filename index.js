@@ -9,6 +9,7 @@ import customerRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import session from 'express-session';
 import { serverError } from './middlewares/errorMiddleware.js';
+import logger from './utils/logger.js';
 
 const app = express();
 
@@ -45,7 +46,7 @@ app.use(serverError)
 Connection();
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT,()=>{
-    console.log(`server is running at http://localhost:${PORT}`);
+app.listen(PORT,()=>{    
+    logger.info(`server is running at http://localhost:${PORT}`)
 });
 

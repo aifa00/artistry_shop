@@ -3,6 +3,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { dirname } from 'path';
+import logger from '../../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -118,8 +119,8 @@ export const getEditCategory = async (req, res, next) => {
 
         const foundCategory = await Category.findById(req.params.id);
 
-        if (!foundCategory) {
-            console.log("no category found");
+        if (!foundCategory) {            
+            logger.info('no category found');
         } else {
             res.render('admin/category/editCategory', {
                 categoryData: foundCategory,
@@ -145,7 +146,10 @@ export const editCategory = async (req, res, next) => {
         if (typeof image !== "undefined") {
             fs.unlink(path.join(__dirname, "../../public", foundCategory.image), (err) => {
                 if (err) {
-                    console.error(err);
+                    logger.log({
+                        level:'error',
+                        message: err,
+                    });
                 }
             });
             updatedData.image = "/categories/" + image;

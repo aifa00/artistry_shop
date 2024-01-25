@@ -1,4 +1,5 @@
 import Coupon from "../../models/couponModel.js";
+import logger from "../../utils/logger.js";
 
 
 //GET ADD COUPON
@@ -67,8 +68,12 @@ async function generateCouponCode(length) {
         return couponCode;
 
     } catch (error) {
-        // Handle errors, e.g., log or throw an exception
-        console.error("Error generating coupon code:", error);
+
+        logger.log({
+            level: 'error',
+            message: `Error generating coupon code:", ${error}`,
+        });
+
         throw error;
     }
 }
@@ -118,7 +123,7 @@ export const getEditCoupon = async (req, res, next) => {
         const foundCoupon = await Coupon.findById(req.params.id);
 
         if (!foundCoupon) {
-            console.log("no coupon found");
+            logger.info('no coupon found');
         } else {
             res.render('admin/coupons/editCoupon', {
                 foundCoupon,

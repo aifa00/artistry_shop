@@ -79,7 +79,28 @@
                                                             
                                                             <a href="/product/<%= product._id %>">
                                                                 <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
-                                                            </a>                                                            
+                                                            </a>        
+                                                            <form class="addToWishlistForm" action="/add-to-wishlist" method="post">
+                                                                <div class="product-action-vertical">
+                                                                    <% if (isLoggedIn) { %>
+                                                                        <% if (currentUser && currentUser.wishlist.some(item => item.equals(product._id.toString()))) { %>
+                                                                            <button type="submit" style="color: rgb(255, 28, 28);font-size: 2rem;cursor: pointer;background: none;border: none;" id="addToWishlist">
+                                                                                <i class="bi bi-heart-fill"></i>
+                                                                            </button>
+                                                                        <% } else { %>
+                                                                            <input type="hidden" name="product" value="<%= product._id %>">                                                                       
+                                                                            <button type="submit" style="color: white;font-size: 2rem;cursor: pointer;background: none;border: none;" id="addToWishlist">
+                                                                                <i class="bi bi-heart"></i>
+                                                                            </button>
+                                                                        <% } %>   
+                                                                    <% } else { %>
+                                                                        <a href="/login" style="color: white;font-size: 2rem;cursor: pointer;" id="addToWishlist">
+                                                                            <i class="bi bi-heart"></i>
+                                                                        </a>
+                                                                    <% } %>
+                                                                    
+                                                                </div>
+                                                            </form>
                                                             
                                                             <form class="addToCartForm" action="/add-to-cart" method="post">
                                                             <div class="product-action">
@@ -337,6 +358,36 @@
             document.getElementById("sortForm").submit();
         }
     </script>
+    <script>
+
+        $(document).ready(function() {
+            // Handle the form submission with AJAX
+            $('.addToWishlistForm').submit(function(event) {
+                // Prevent the default form submission
+                event.preventDefault();
+    
+                // Collect form data
+                var formData = $(this).serialize();
+                console.log(formData);
+    
+                // Make an AJAX request
+                $.ajax({
+                    url: '/add-to-wishlist',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    
+        </script>
     <script>
 
     $(document).ready(function() {
