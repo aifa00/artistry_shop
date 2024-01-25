@@ -229,6 +229,65 @@ export const addToWishlist = async (req, res, next) => {
     }
 };
 
+
+//get wishlist
+export const getWishlist = async (req, res, next) => {
+    try { 
+        const currentUser = await getCurrentUser(req, res);
+
+        if (currentUser) {
+            await currentUser.populate('wishlist');
+            await currentUser.populate('wishlist.category');
+
+            const foundProducts = currentUser.wishlist;
+
+
+            res.render("user/wishlist", {
+                isLoggedIn: isLoggedIn(req, res),
+                currentUser,
+                foundProducts,            
+            });
+
+        } else {                
+           res.redirect('/shop')
+        }   
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+//remove from wishlist
+export const removeFromWishlist = async (req, res, next) => {
+    try {
+
+        const currentUser = await getCurrentUser(req, res);
+
+        const itemIndex = currentUser.wishlist.findIndex(item => item === req.params.id);
+
+        currentUser.wishlist.splice(itemIndex, 1);
+
+        await currentUser.save();
+
+
+
+        req.session.message = {
+            type: 'success',
+            message: 'Item removed from wishlist'
+        }
+
+      
+        res.status(200).json({success: true});
+
+
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 //get single product
 export const getProduct = async (req, res, next) => {
     try {
@@ -237,15 +296,13 @@ export const getProduct = async (req, res, next) => {
         res.render("user/singleProduct", {
             isLoggedIn: isLoggedIn(req, res),
             currentUser: await getCurrentUser (req, res),
-            foundProduct,
-            activePage: 'Shop',
-
+            foundProduct,            
         });
+        
     } catch (error) {
         next(error);
     }
 };
-
 
 
 

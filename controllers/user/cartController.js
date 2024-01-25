@@ -13,9 +13,13 @@ import createInvoice from "../../utils/invoice.js";
 
 export const addToCart = async (req, res, next) => {
     try {
-        const currentUser = await getCurrentUser(req, res);
         const { product, fixedQuantity } = req.body;
 
+        const currentUser = await getCurrentUser(req, res);
+        
+
+
+        //add item to cart
         currentUser.cart = currentUser.cart || [];
         
         const cartItem = {
@@ -23,11 +27,30 @@ export const addToCart = async (req, res, next) => {
             quantity: parseInt(fixedQuantity),
         };
         currentUser.cart.push(cartItem);
+        
 
+        
+        //check if addition is from wishlist
+        if(req.body.from && req.body.from === 'wishlist') {
+            
+            const wishlistItemIndex = currentUser.wishlist.findIndex(item => item === product);
+
+            currentUser.wishlist.splice(wishlistItemIndex, 1);            
+        }
+
+
+        //save changes after updations
         await currentUser.save();
+
+
+
+        //update coupon status
         if (req.session.couponApplied) {
             req.session.couponApplied = null; 
         }
+
+
+        //notification and redirection
         req.session.message = {
             type :'success',
             message: 'Item added to cart!',
@@ -109,6 +132,7 @@ export const getCart = async (req, res, next) => {
             insufficientStockProduct: '',
             activePage: 'Cart',
             });
+
         } else {
             res.render("user/cart", {
                 isLoggedIn: isLoggedIn(req, res),

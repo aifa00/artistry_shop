@@ -19,9 +19,7 @@
                             
                         </li>
                         <li>
-                            <a href="/shop" >SHOP</a>
-
-                            
+                            <a href="/shop" >SHOP</a>                            
                         </li>
                         
                     </ul><!-- End .menu -->
@@ -44,7 +42,7 @@
                <% } else { %>
 
                   <div class="dropdown">
-                    <a style="margin-left: 30px; font-size: 30px;cursor: pointer;" href="" role="button" data-toggle="dropdown" aria-expanded="false">
+                    <a style="margin-left: 2rem; font-size: 3rem;cursor: pointer;" href="" role="button" data-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person"></i>
                     </a>
                   
@@ -78,14 +76,19 @@
                         </div>
                       </div>
                     </div>
-                  </div>        
-                <%} %>
-                <div class="dropdown cart-dropdown">
-                    <a href="/cart" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false" data-display="static">
-                        <i class="icon-shopping-cart"></i>                                
-                    </a>
-                </div>
+                  </div>                                       
 
+                <a style=" margin-left: 2rem; font-size: 2.1rem;cursor: pointer;color: black;" href="/wishlist">
+                    <i class="bi bi-heart"></i>
+                </a>
+
+
+                <%} %>
+                
+                <a style=" margin-left: 2rem; font-size: 2.6rem;cursor: pointer;color: black;" href="/cart">
+                    <i class="bi bi-cart2"></i>                            
+                </a>
+                            
             </div>
         </div>
     </div>

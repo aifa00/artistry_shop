@@ -103,6 +103,8 @@
                                                                          
                                 </div>
 
+                                
+
                                 <form class="addToCartForm" action="/add-to-cart" method="post">
                                     <div class="details-filter-row details-row-size">
                                         <label for="qty">Qty:</label>
@@ -120,22 +122,39 @@
 
                                             <% if (isLoggedIn) { %>
                                                 <% if (currentUser && currentUser.cart.some((item) => item.product.toString() === foundProduct._id.toString()) ) { %>
-                                                    <a href="/cart" class="btn-product btn-cart">GO TO CART</a>
+                                                    <a href="/cart" class="btn-product btn-cart" style="margin-right: 3rem;">GO TO CART</a>
                                                     
                                                 <% } else { %>
                                                                                                        
                                                         <input type="hidden" name="product" value="<%= foundProduct._id %>">
                                                         
-                                                        <button type="submit" class="btn btn-product btn-cart">
+                                                        <button type="submit" class="btn btn-product btn-cart" style="margin-right: 3rem;">
                                                           ADD TO CART
                                                         </button>
                                                       
                                                 <% } %>
                                             <% } else { %>
-                                                <a href="/login" class="btn btn-product btn-cart">ADD TO CART</a>
+                                                <a href="/login" class="btn btn-product btn-cart" style="margin-right: 3rem;">ADD TO CART</a>
                                             <% } %>
                                                                                         
                                         <% } %>
+                                    </form>
+
+                                    <form class="addToWishlistForm" action="/add-to-wishlist" method="post">                                       
+                                            <% if (isLoggedIn) { %>
+                                                <% if (currentUser && currentUser.wishlist.some(item => item.equals(foundProduct._id.toString()))) { %>
+                                                    <button type="button" class="btn-product" style="border: none;" onclick="removeItem('<%= foundProduct._id %>')">remove from wishlist &nbsp;<i class="bi bi-heart-fill"></i></a>
+                                                <% } else { %>
+                                                    <input type="hidden" name="product" value="<%= foundProduct._id %>">                                                                       
+                                                    <button type="submit" class="btn-product" style="border: none;">
+                                                        add to wishlist &nbsp;<i class="bi bi-heart"></i>
+                                                    </button>
+                                                <% } %>   
+                                            <% } else { %>
+                                                <a href="/login" class="btn-product">
+                                                    add to wishlist &nbsp;<i class="bi bi-heart"></i>
+                                                </a>
+                                            <% } %>                                                                                    
                                     </form>
                                         
                                     </div>
@@ -195,8 +214,7 @@
     <script src="/user/js/jquery.magnific-popup.min.js"></script>
     <script src="/user/js/main.js"></script>
 
-    <script>
-   
+    <script> 
     $(document).ready(function() {
         // Handle the form submission with AJAX
         $('.addToCartForm').submit(function(event) {
@@ -224,6 +242,52 @@
         });
     });
     </script>
+    <script>
+        //add to wishlist
+        $(document).ready(function() {
+           
+            $('.addToWishlistForm').submit(function(event) {
+               
+                event.preventDefault();
     
+               
+                var formData = $(this).serialize();
+                console.log(formData);
+    
+                
+                $.ajax({
+                    url: '/add-to-wishlist',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {                
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    
+    </script>
+    <script>
+        //remove from wishlist
+        function removeItem(productId) {
+
+            console.log("button is triggered", productId)
+
+            $.ajax({
+                url: '/remove-from-wishlist/' + productId,
+                type: 'POST',
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

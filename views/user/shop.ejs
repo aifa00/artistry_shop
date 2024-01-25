@@ -84,17 +84,17 @@
                                                                 <div class="product-action-vertical">
                                                                     <% if (isLoggedIn) { %>
                                                                         <% if (currentUser && currentUser.wishlist.some(item => item.equals(product._id.toString()))) { %>
-                                                                            <button type="submit" style="color: rgb(255, 28, 28);font-size: 2rem;cursor: pointer;background: none;border: none;" id="addToWishlist">
+                                                                            <button type="button" onclick="removeItem('<%= product._id %>')" style="color: rgb(255, 28, 28);font-size: 2rem;cursor: pointer;background: none;border: none;">
                                                                                 <i class="bi bi-heart-fill"></i>
                                                                             </button>
                                                                         <% } else { %>
                                                                             <input type="hidden" name="product" value="<%= product._id %>">                                                                       
-                                                                            <button type="submit" style="color: white;font-size: 2rem;cursor: pointer;background: none;border: none;" id="addToWishlist">
+                                                                            <button type="submit" style="color: white;font-size: 2rem;cursor: pointer;background: none;border: none;">
                                                                                 <i class="bi bi-heart"></i>
                                                                             </button>
                                                                         <% } %>   
                                                                     <% } else { %>
-                                                                        <a href="/login" style="color: white;font-size: 2rem;cursor: pointer;" id="addToWishlist">
+                                                                        <a href="/login" style="color: white;font-size: 2rem;cursor: pointer;">
                                                                             <i class="bi bi-heart"></i>
                                                                         </a>
                                                                     <% } %>
@@ -354,23 +354,24 @@
 
     
     <script>
+        //sorting
         function submitForm() {
             document.getElementById("sortForm").submit();
         }
     </script>
     <script>
-
+        //add to wishlist
         $(document).ready(function() {
-            // Handle the form submission with AJAX
+           
             $('.addToWishlistForm').submit(function(event) {
-                // Prevent the default form submission
+               
                 event.preventDefault();
     
-                // Collect form data
+               
                 var formData = $(this).serialize();
                 console.log(formData);
     
-                // Make an AJAX request
+                
                 $.ajax({
                     url: '/add-to-wishlist',
                     type: 'POST',
@@ -379,15 +380,32 @@
                     success: function(response) {
                         location.reload();
                     },
-                    error: function(xhr, status, error) {
-                        // Handle errors
+                    error: function(xhr, status, error) {                
                         console.error('Error:', error);
                     }
                 });
             });
         });
     
-        </script>
+    </script>
+    <script>
+        //remove from wishlist
+        function removeItem(productId) {
+
+            console.log("button is triggered", productId)
+
+            $.ajax({
+                url: '/remove-from-wishlist/' + productId,
+                type: 'POST',
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
     <script>
 
     $(document).ready(function() {

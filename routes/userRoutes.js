@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getHome,getShop, getProduct, placeOrder, saveRazorpayOrder, applyWallet, 
-  getOrderPlaced, returnProduct, addToWishlist} from '../controllers/user/userController.js';
+  getOrderPlaced, returnProduct, addToWishlist, getWishlist, removeFromWishlist} from '../controllers/user/userController.js';
 import { notLoggedin, isBlocked, isUser } from '../middlewares/userMiddleware.js';
 import { getRegister, getLogin, registerUser, loginUser, logoutUser, Verification, resendOTP, getChangePassword, 
   changePassword, getForgotPassword, getOtp, getNewPassword, newPassword} from '../controllers/authController.js';
@@ -37,6 +37,10 @@ router.post('/update-cart/:id',isBlocked, isUser, updateCart)
 router.post("/remove-from-cart/:id", isBlocked, isUser, removeFromCart);
 
 router.post('/add-to-wishlist', isBlocked, isUser, addToWishlist);
+
+router.get('/wishlist',isBlocked, isUser, getWishlist);
+
+router.post("/remove-from-wishlist/:id", isBlocked, isUser, removeFromWishlist);
 
 
 router.route('/shop')
