@@ -18,7 +18,7 @@ generateSalt();
 export const getRegister = (req, res) => {
     res.render("user/auth/register", {
         commonError: '',
-        ref: req.query.ref ? req.query.ref : '',
+        ref: req.query.ref ? req.query.ref : null,
     });
 };
 

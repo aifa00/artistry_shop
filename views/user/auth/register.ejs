@@ -129,8 +129,8 @@
                                       <span style="color: rgb(0, 0, 0);font-size: 14px;" > Show password</span>
                                      </div>
                                    </div>
-
-                                   <input type="hidden" value="<%= ref %>" name="ref">
+                                   
+                                   <input type="hidden" name="ref" value="<%= ref %>">
 
                                    <span id="commonError"><%= commonError  %></span>
                               </div>
@@ -171,14 +171,7 @@
           document.getElementById("passwordError").innerHTML = "";
           document.getElementById("confirmPasswordError").innerHTML = "";
           document.getElementById("nameError").innerHTML = "";
-    
-          //validate input fields on submit
-          // if (!nameInput.value || !emailInput.value || !phoneInput.value || !passwordInput.value || !confirmPasswordInput.value) {
-
-          //   hasErrors = true;
-          //   document.getElementById("commonError").innerHTML = "Please fill in all fields";
-
-          // } else {
+            
             if (!nameInput.value) {
               hasErrors = true;
               document.getElementById("nameError").innerHTML = "This field is required";
