@@ -1,16 +1,12 @@
-import fs from 'fs';
-import PDFDocument from 'pdfkit';
-
+import fs from "fs";
+import PDFDocument from "pdfkit";
 
 async function createInvoice(invoice, req, res, next) {
-
   let doc = new PDFDocument({ size: "A4", margin: 50 });
 
-
   // Set the PDF response headers
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
-
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", "attachment; filename=Invoice.pdf");
 
   doc.pipe(res);
 
@@ -20,10 +16,7 @@ async function createInvoice(invoice, req, res, next) {
   generateFooter(doc);
 
   doc.end();
-
 }
-
-
 
 function generateHeader(doc) {
   doc
@@ -31,7 +24,7 @@ function generateHeader(doc) {
     .fillColor("#444444")
     .fontSize(20)
     .text("ARTISTRY Inc.", 110, 57)
-    
+
     .fontSize(10)
     .text("ARTISRTY Inc.", 200, 50, { align: "right" })
     .text("Abcd street", 200, 65, { align: "right" })
@@ -39,13 +32,8 @@ function generateHeader(doc) {
     .moveDown();
 }
 
-
-
 function generateCustomerInformation(doc, invoice) {
-  doc
-    .fillColor("#444444")
-    .fontSize(20)
-    .text("Invoice", 50, 160);
+  doc.fillColor("#444444").fontSize(20).text("Invoice", 50, 160);
 
   generateHr(doc, 185);
 
@@ -60,25 +48,30 @@ function generateCustomerInformation(doc, invoice) {
     .text("Invoice Date:", 50, customerInformationTop + 15)
     .text(formatDate(new Date()), 150, customerInformationTop + 15)
     .text("Order Date:", 50, customerInformationTop + 30)
-    .text(formatDate(new Date(invoice.orderdate)), 150, customerInformationTop + 30)
+    .text(
+      formatDate(new Date(invoice.orderdate)),
+      150,
+      customerInformationTop + 30
+    )
 
     .font("Helvetica-Bold")
     .text(invoice.shipping.name, 300, customerInformationTop)
     .font("Helvetica")
     .text(invoice.shipping.address, 300, customerInformationTop + 15)
-    .text(invoice.shipping.city + ", " + 
-          invoice.shipping.state + ", " + 
-          invoice.shipping.postal_code, 
-          300, 
-          customerInformationTop + 30)
+    .text(
+      invoice.shipping.city +
+        ", " +
+        invoice.shipping.state +
+        ", " +
+        invoice.shipping.postal_code,
+      300,
+      customerInformationTop + 30
+    )
     .text(invoice.shipping.phone, 300, customerInformationTop + 45)
     .moveDown();
 
   generateHr(doc, 260);
-  
 }
-
-
 
 function generateInvoiceTable(doc, invoice) {
   let i;
@@ -97,7 +90,7 @@ function generateInvoiceTable(doc, invoice) {
   );
 
   generateHr(doc, invoiceTableTop + 20);
-  
+
   doc.font("Helvetica");
   for (i = 0; i < invoice.items.length; i++) {
     const item = invoice.items[i];
@@ -155,15 +148,11 @@ function generateInvoiceTable(doc, invoice) {
 function generateFooter(doc) {
   doc
     .fontSize(10)
-    .text(
-      "Thank you for your purchase .",
-      50,
-      780,
-      { align: "center", width: 500 }
-    );
+    .text("Thank you for your purchase .", 50, 780, {
+      align: "center",
+      width: 500,
+    });
 }
-
-
 
 //custom functions
 function generateTableRow(
@@ -184,18 +173,12 @@ function generateTableRow(
     .text(lineTotal, 0, y, { align: "right" });
 }
 
-
 function generateHr(doc, y) {
-  doc
-    .strokeColor("#aaaaaa")
-    .lineWidth(1)
-    .moveTo(50, y)
-    .lineTo(550, y)
-    .stroke();
+  doc.strokeColor("#aaaaaa").lineWidth(1).moveTo(50, y).lineTo(550, y).stroke();
 }
 
 function formatCurrency(cents) {
-  return (cents).toFixed(2);  
+  return cents.toFixed(2);
 }
 
 function formatDate(date) {

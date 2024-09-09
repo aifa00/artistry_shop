@@ -368,8 +368,7 @@
                 event.preventDefault();
     
                
-                var formData = $(this).serialize();
-                console.log(formData);
+                var formData = $(this).serialize();                
     
                 
                 $.ajax({
@@ -390,9 +389,7 @@
     </script>
     <script>
         //remove from wishlist
-        function removeItem(productId) {
-
-            console.log("button is triggered", productId)
+        function removeItem(productId) { 
 
             $.ajax({
                 url: '/remove-from-wishlist/' + productId,
@@ -401,7 +398,7 @@
                     location.reload();
                 },
                 error: function(xhr, status, error) {
-                    console.log(error);
+                 
                 }
             });
         }
@@ -415,8 +412,7 @@
             event.preventDefault();
 
             // Collect form data
-            var formData = $(this).serialize();
-            console.log(formData);
+            var formData = $(this).serialize(); 
 
             // Make an AJAX request
             $.ajax({

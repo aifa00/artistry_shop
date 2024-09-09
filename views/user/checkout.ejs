@@ -252,9 +252,14 @@
                                             </div>
                                             
                                             <span class="text-danger mb-1" id="checkoutError"></span>
-                                            <button type="button" id="placeOrderButton" data-toggle="modal" data-target="#placeOrderModal" class="btn btn-outline-primary-2 btn-order btn-block">
-                                                Place Order
-                                            </button>                                           
+                                            
+                                            <% if (defaultAddress) { %>
+                                                <button type="button" id="placeOrderButton" data-toggle="modal" data-target="#placeOrderModal" class="btn btn-outline-primary-2 btn-order btn-block">
+                                                    Place Order
+                                                </button> 
+                                            <% } else { %>
+                                                <p class="text-primary">Please add an address to continue</p>
+                                            <% } %>                                          
                                         </form>
                                         
 		                			</div>
@@ -509,7 +514,7 @@
                 
             },
             error: function(xhr, status, error) {
-                console.log(status);
+                console.log(error);
             }
             });
 

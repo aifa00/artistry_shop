@@ -1,318 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-<head>
+  <head>
     <%- include('./partials/head') -%>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="page-wrapper">
-        
-        <%- include('./partials/header') -%>        
-        
+      <%- include('./partials/header') -%>
 
-        <main class="main">
-    
-            <nav aria-label="breadcrumb" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>                        
-                        <li class="breadcrumb-item active" aria-current="page">Orders</li>
-                    </ol>
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
+      <main class="main">
+        <nav aria-label="breadcrumb" class="breadcrumb-nav">
+          <div class="container">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Orders</li>
+            </ol>
+          </div>
+          <!-- End .container -->
+        </nav>
+        <!-- End .breadcrumb-nav -->
 
-            <div class="page-content">
-            
-                    
-	                <div class="container">
-                        
-	                	<div class="row">
-                            <h5 style="margin-left: 10px;" >MY ORDERS</h5>
-                            <% if (!orders.length) { %>
-                                <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 70vh;">
-                                    <H5>NO ORDERS FOUND</H5>
-                                    
+        <div class="page-content">
+          <div class="container">
+            <div class="row">
+              <h5 style="margin-left: 10px">MY ORDERS</h5>
+              <% if (!orders.length) { %>
+              <div
+                class="container-fluid d-flex flex-column align-items-center justify-content-center"
+                style="height: 70vh"
+              >
+                <H5>NO ORDERS FOUND</H5>
+              </div>
+              <% } else { %> <% orders.forEach ((order) => { %>
+              <div class="col-md-12">
+                <div class="col-lg-12 p-4 border mb-3">
+                  <div class="d-flex flex-column">
+                    <div class="d-flex">
+                      <div style="margin-right: 5rem">
+                        <a
+                          href="/single-order/<%= order._id %>/<%= order.orderedProducts[0]._id %>"
+                        >
+                          <img
+                            src="<%= order.orderedProducts[0].images[0] %>"
+                            alt="img"
+                            height="110rem"
+                            width="110rem"
+                          />
+                        </a>
+                      </div>
+
+                      <div>
+                        <a
+                          href="/single-order/<%= order._id %>/<%= order.orderedProducts[0]._id %>"
+                        >
+                          <span class="d-block text-primary h5 text-uppercase"
+                            ><%= order.orderedProducts[0].title %></span
+                          >
+                        </a>
+                        <p class="mb-0">
+                          Quantity: <%= order.products.quantity %>, Price:
+                          &#8377; <%= order.orderedProducts[0].price.toFixed(2)
+                          %>
+                        </p>
+                        <p>
+                          <% if (order.products.status !== 'Cancelled' &&
+                          order.products.status !== 'Delivered' &&
+                          order.products.returnRequested === 'Nil' ) { %>
+                          Delivery expected on <%=
+                          order.deliveryDate.toLocaleDateString('en-US', {
+                          month:'short', day: 'numeric', year: 'numeric' }) %>
+                          <br />
+
+                          <% } %> <% if (order.products.status !== 'Cancelled'
+                          && order.products.returnRequested === 'Nil') { %> <%
+                          if (order.products.status === 'Delivered') { %>
+                          <strong class="text-success"
+                            ><%= order.products.status %></strong
+                          >
+                          <% } else { %>
+                          <strong><%= order.products.status %></strong>
+                          <% } %> <% } %>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="mt-1">
+                      <% if (order.products.status === 'Cancelled') { %>
+                      <strong class="text-danger">CANCELLED</strong>
+
+                      <% } else { %> <% if (order.products.status ===
+                      'Processing' ) { %>
+
+                      <form
+                        action="/cancel-order"
+                        method="post"
+                        id="<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>"
+                      >
+                        <input
+                          type="hidden"
+                          name="orderId"
+                          value="<%= order._id %>"
+                        />
+                        <input
+                          type="hidden"
+                          name="productId"
+                          value="<%= order.orderedProducts[0]._id %>"
+                        />
+                        <button
+                          type="button"
+                          class="btn btn-block btn-outline-primary"
+                          onclick="openCancelOrderModal('<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>')"
+                        >
+                          CANCEL ORDER
+                        </button>
+                      </form>
+
+                      <% } else if (order.products.status === 'Delivered' ) { %>
+                      <% const currentDate=new Date(); %> <% const
+                      deliveryDate=new Date(order.deliveryDate); %> <% const
+                      sevenDaysAfterDelivery=new Date(deliveryDate); %> <%
+                      sevenDaysAfterDelivery.setDate(sevenDaysAfterDelivery.getDate()
+                      + 7); %> <% if (order.products.returnRequested ===
+                      "Initiated") { %>
+
+                      <strong class="text-primary text-uppercase"
+                        >Return Initiated</strong
+                      >
+
+                      <% } else if (order.products.returnRequested ===
+                      "Pending") { %>
+
+                      <strong class="text-warning text-uppercase"
+                        >Return Pending</strong
+                      >
+
+                      <% } else if (order.products.returnRequested ===
+                      "Rejected") { %>
+
+                      <strong class="text-danger text-uppercase"
+                        >Return Rejected</strong
+                      >
+
+                      <% } else if (order.products.returnRequested ===
+                      "Approved") { %>
+
+                      <strong class="text-success text-uppercase"
+                        >Return Approved</strong
+                      >
+
+                      <% } else if (order.products.returnRequested ===
+                      "Completed") { %>
+
+                      <strong class="text-uppercase">Returned</strong>
+
+                      <% } else if (currentDate <= sevenDaysAfterDelivery) { %>
+
+                      <button
+                        type="button"
+                        class="btn btn-block btn-primary"
+                        data-toggle="modal"
+                        data-target="#returnModal<%= order.products.product %>"
+                      >
+                        Return
+                      </button>
+
+                      <% } %> <% } %> <% } %>
+
+                      <!-- Modal to return -->
+                      <div
+                        class="modal fade"
+                        id="returnModal<%= order.products.product %>"
+                      >
+                        <div
+                          class="modal-dialog modal-dialog-centered"
+                          role="document"
+                        >
+                          <div class="modal-content">
+                            <div
+                              class="card shadow-2-strong"
+                              style="padding: 8rem"
+                            >
+                              <div class="card-body text-center">
+                                <h4>RETURN PRODUCT</h4>
+                              </div>
+
+                              <form
+                                class="returnForm"
+                                action="/return-product"
+                                method="post"
+                              >
+                                <div
+                                  class="d-flex justify-content-between align-items-center mb-2"
+                                >
+                                  <div>
+                                    <span
+                                      class="d-block text-primary h5 text-uppercase mb-0"
+                                      ><%= order.orderedProducts[0].title
+                                      %></span
+                                    >
+                                    <p>
+                                      Quantity: <%= order.products.quantity %>
+                                      <br />
+                                      &#8377; <%=
+                                      order.orderedProducts[0].price.toFixed(2)
+                                      %>
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <img
+                                      src="<%= order.orderedProducts[0].images[0] %>"
+                                      alt="img"
+                                      height="90rem"
+                                      width="90rem"
+                                      style="border-radius: 1rem"
+                                    />
+                                  </div>
                                 </div>
-                            <% } else { %>
-                                <% orders.forEach ((order) => { %>
-                                    <div class="col-md-12">
-                                       
-                                            <div class="col-lg-12 p-4 border mb-3">
 
-                                                <div class="d-flex flex-column">
-                                                  
-                                                    <div class="d-flex" >
+                                <div class="formInput mb-2">
+                                  <h6 class="text-black">Reason For Return</h6>
+                                  <div>
+                                    <input
+                                      type="radio"
+                                      name="reason"
+                                      value="Received wrong item"
+                                    />
+                                    <label for="reason1"
+                                      >Received wrong item</label
+                                    >
+                                  </div>
+                                  <div>
+                                    <input
+                                      type="radio"
+                                      name="reason"
+                                      value="Don't want the product anymore"
+                                    />
+                                    <label for="reason2"
+                                      >Don't want the product anymore</label
+                                    >
+                                  </div>
+                                  <div>
+                                    <input
+                                      type="radio"
+                                      name="reason"
+                                      value="Product is missing in the package"
+                                    />
+                                    <label for="reason3"
+                                      >Product is missing in the package</label
+                                    >
+                                  </div>
+                                  <div>
+                                    <input
+                                      type="radio"
+                                      name="reason"
+                                      value="Quality of the product not as expected"
+                                    />
+                                    <label for="reason4"
+                                      >Quality of the product not as
+                                      expected</label
+                                    >
+                                  </div>
+                                  <div>
+                                    <input
+                                      type="radio"
+                                      name="reason"
+                                      value="the product received is defective"
+                                    />
+                                    <label for="reason5"
+                                      >the product received is defective</label
+                                    >
+                                  </div>
+                                  <div>
+                                    <input
+                                      type="radio"
+                                      name="reason"
+                                      value="the product received is defective"
+                                    />
+                                    <label for="reason6"
+                                      >Received a broken/damaged item</label
+                                    >
+                                  </div>
 
-                                                        <div style="margin-right: 5rem;"> 
-                                                            <a href="/single-order/<%= order._id %>/<%= order.orderedProducts[0]._id %>">
-                                                                <img src="<%= order.orderedProducts[0].images[0] %>" alt="img" height="110rem"  width="110rem">
-                                                            </a>
-                                                        </div>
+                                  <span
+                                    class="text-danger"
+                                    id="reasonError"
+                                  ></span>
+                                </div>
 
-                                                        <div>
-                                                            <span class="d-block text-primary h5 text-uppercase"><%= order.orderedProducts[0].title %></span>                                                           
-                                                            <p class="mb-0">
-                                                                Quantity: <%= order.products.quantity %>,
-                                                                Price: &#8377; <%= order.orderedProducts[0].price.toFixed(2) %>                                                                                                                    
-                                                            </p>
-                                                            <p>                                                                                                                                
-                                                                <% if (order.products.status !== 'Cancelled' && order.products.status !== 'Delivered' && order.products.returnRequested === 'Nil' ) { %>
-                                                                    Delivery expected on <%= order.deliveryDate.toLocaleDateString('en-US', { month:'short', day: 'numeric', year: 'numeric' }) %> <br>
-                                                                    
-                                                                <% } %>
+                                <div class="formInput mb-2">
+                                  <h6 class="text-black">
+                                    Condition Of The Product
+                                  </h6>
 
-                                                                <% if (order.products.status !== 'Cancelled' && order.products.returnRequested === 'Nil') { %>
-                                                                    <% if (order.products.status === 'Delivered') { %>
-                                                                        <strong class="text-success" ><%= order.products.status %></strong>
-                                                                    <% } else { %>
-                                                                        <strong><%= order.products.status %></strong>
-                                                                    <% } %>
-                                                                <% } %>
-                                                            </p>
-                                                        </div>                                                        
-                                                    </div>
-                                                    
-                                                    <div class="mt-1">
-                                                                          
-                                                    <% if (order.products.status === 'Cancelled') { %>                        
-                                                        <strong class="text-danger">CANCELLED</strong>
-                                                    
-                                                    <% } else { %>
+                                  <select
+                                    name="condition"
+                                    class="form-control condition"
+                                    required
+                                  >
+                                    <option value="Unused">
+                                      Unused and Unopened
+                                    </option>
+                                    <option value="In Resalable Condition">
+                                      In Resalable Condition
+                                    </option>
+                                    <option value="No Sign Of Wear and Tear">
+                                      No Sign Of Wear and Tear
+                                    </option>
+                                    <option value="Properly Packaged">
+                                      Properly Packaged
+                                    </option>
+                                  </select>
 
-                                                        <% if (order.products.status === 'Processing' ) { %>
-                                                            
-                                                                                                            
-                                                        <form action="/cancel-order" method="post" id="<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>" >
-                                                          <input type="hidden" name="orderId" value="<%= order._id %>">
-                                                          <input type="hidden" name="productId" value="<%= order.orderedProducts[0]._id %>">
-                                                          <button type="button" class="btn btn-block btn-outline-primary" onclick="openCancelOrderModal('<%= `cancel_order${order._id}${order.orderedProducts[0]._id}` %>')">
-                                                            CANCEL ORDER
-                                                          </button>
-                                                        </form>
-                                                                                                                
+                                  <span
+                                    class="text-danger"
+                                    id="conditionError"
+                                  ></span>
+                                </div>
 
-                                                        <% } else if (order.products.status === 'Delivered' ) { %>
+                                <div class="formInput mb-2">
+                                  <h6 class="text-black">Refund Amount</h6>
 
-                                                        <% const currentDate=new Date(); %>
-                                                        <% const deliveryDate=new Date(order.deliveryDate); %>
-                                                        <% const sevenDaysAfterDelivery=new Date(deliveryDate); %>
-                                                        <% sevenDaysAfterDelivery.setDate(sevenDaysAfterDelivery.getDate() + 7); %>
+                                  <input type="radio" value="wallet" checked />
+                                  <label>wallet</label>
+                                </div>
 
-                                                        <% if (order.products.returnRequested === "Initiated") { %>
-                                                                                                        
-                                                            <strong class="text-primary text-uppercase">Return Initiated</strong>
+                                <div class="formInput mb-2">
+                                  <h6 class="text-black">Pick Up Address</h6>
 
-                                                        <% } else if (order.products.returnRequested === "Pending") { %>
+                                  <% if (addresses.length) { %> <%
+                                  addresses.forEach((address) => { %>
+                                  <div class="d-flex align-items-start">
+                                    <input type="radio" class="mr-3 mt-1" <%=
+                                    address.default ? 'checked' : '' %>
+                                    name="pickupAddress" value="<%= address._id
+                                    %>">
+                                    <label>
+                                      <strong class="text-primary"
+                                        ><%= address.name %></strong
+                                      ><br />
+                                      <strong class="text-primary"
+                                        ><%= address.phone %></strong
+                                      ><br />
+                                      <span><%= address.building %></span>,<span
+                                        ><%= address.area %></span
+                                      ><br />
+                                      <span><%= address.city %></span>,<span
+                                        ><%= address.state %></span
+                                      >,<span><%= address.pincode %></span
+                                      ><br />
+                                    </label>
+                                  </div>
+                                  <% }) %> <% } %>
+                                </div>
 
-                                                            <strong class="text-warning text-uppercase">Return Pending</strong>
+                                <input
+                                  type="hidden"
+                                  name="productId"
+                                  value="<%= order.products.product %>"
+                                />
+                                <input
+                                  type="hidden"
+                                  name="orderId"
+                                  value="<%= order._id %>"
+                                />
+                                <input
+                                  type="hidden"
+                                  name="quantity"
+                                  value="<%= order.products.quantity %>"
+                                />
 
-                                                        <% } else if (order.products.returnRequested === "Rejected") { %>
-                                                            
-                                                            <strong class="text-danger text-uppercase">Return Rejected</strong>
-                                                        
-                                                        <% } else if (order.products.returnRequested === "Approved") { %>
-                                                        
-                                                            <strong class="text-success text-uppercase">Return Approved</strong>
-
-                                                        <% } else if (order.products.returnRequested === "Completed") { %>
-                                                        
-                                                            <strong class="text-uppercase">Returned</strong>
-
-                                                        <% } else if (currentDate <= sevenDaysAfterDelivery) { %>
-                                                
-                                                        <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#returnModal<%= order.products.product %>">
-                                                            Return
-                                                        </button>
-
-                                                        <% } %>
-
-
-                                                        <% } %>
-                                                    <% } %>   
-                                                        
-                                                        <!-- Modal to return -->
-                                                        <div class="modal fade" id="returnModal<%= order.products.product %>">
-                                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                              <div class="modal-content">
-                                                                <div class="card shadow-2-strong" style="padding: 8rem;">
-                                                        
-                                                                    <div class="card-body  text-center">
-                                                                          <h4>RETURN PRODUCT</h4>
-                                                                    </div>
-                                                
-                                                                    <form class="returnForm" action="/return-product" method="post">
-                                                
-                                                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                            <div>
-                                                                                <span class="d-block text-primary h5 text-uppercase mb-0"><%= order.orderedProducts[0].title %></span>
-                                                                                <p>
-                                                                                    Quantity: <%= order.products.quantity %> <br>
-                                                                                    &#8377; <%= order.orderedProducts[0].price.toFixed(2) %>                                                                                                                    
-                                                                                </p>
-                                                                                
-                                                                            </div>
-                                                                            <div>
-                                                                                <img src="<%= order.orderedProducts[0].images[0] %>" alt="img" height="90rem"  width="90rem" style="border-radius: 1rem;" >
-                                                                            </div>
-                                                                        </div>
-                                            
-                                                                    
-                                                                        <div class="formInput mb-2">     
-                                                                            <h6 class="text-black">Reason For Return</h6>
-                                                                            <div>
-                                                                                <input type="radio" name="reason" value="Received wrong item">
-                                                                                <label for="reason1">Received wrong item</label>
-                                                                            </div>
-                                                                            <div>
-                                                                                <input type="radio" name="reason" value="Don't want the product anymore">
-                                                                                <label for="reason2">Don't want the product anymore</label>
-                                                                            </div>
-                                                                            <div>
-                                                                                <input type="radio" name="reason"  value="Product is missing in the package">
-                                                                                <label for="reason3">Product is missing in the package</label>
-                                                                            </div>
-                                                                            <div>
-                                                                                <input type="radio" name="reason" value="Quality of the product not as expected">
-                                                                                <label for="reason4">Quality of the product not as expected</label>
-                                                                            </div>
-                                                                            <div>
-                                                                                <input type="radio" name="reason"  value="the product received is defective">
-                                                                                <label for="reason5">the product received is defective</label>
-                                                                            </div>
-                                                                            <div>
-                                                                                <input type="radio" name="reason"  value="the product received is defective">
-                                                                                <label for="reason6">Received a broken/damaged item</label>
-                                                                            </div>
-                                                
-                                                                            <span class="text-danger" id="reasonError"></span>
-                                                                        </div>
-                                                
-
-                                                                        <div class="formInput mb-2">                              
-                                                                            
-                                                                            <h6 class="text-black">Condition Of The Product</h6>
-                                                                            
-                                                                              <select name="condition" class="form-control condition" required>
-                                                                                <option value="Unused">
-                                                                                  Unused and Unopened
-                                                                                </option>
-                                                                                <option value="In Resalable Condition">
-                                                                                  In Resalable Condition
-                                                                                </option>
-                                                                                <option value="No Sign Of Wear and Tear">
-                                                                                  No Sign Of Wear and Tear
-                                                                                </option>
-                                                                                <option value="Properly Packaged">
-                                                                                  Properly Packaged
-                                                                                </option>
-                                                                              </select>
-
-                                                                            <span class="text-danger" id="conditionError"></span>
-                                                                        </div>
-                                                
-
-                                                                        <div class="formInput mb-2">           
-
-                                                                            <h6 class="text-black">Refund Amount</h6>
-                                                                            
-                                                                            <input type="radio" value="wallet" checked>
-                                                                            <label>wallet</label>
-                                                                            
-                                                                        </div>
-                                                                        
-
-                                                                        <div class="formInput mb-2">
-                                                                            <h6 class="text-black">Pick Up Address</h6>
-                                                                            
-                                                                            <% if (addresses.length) { %>
-
-                                                                                <% addresses.forEach((address) => { %>
-                                                                                <div class="d-flex align-items-start">
-                                                                                    
-                                                                                    <input type="radio" class="mr-3 mt-1" <%= address.default ? 'checked' : '' %> name="pickupAddress" value="<%= address._id %>">
-                                                                                    <label>
-                                                                                        <strong class="text-primary"><%= address.name %></strong><br>
-                                                                                        <strong class="text-primary"><%= address.phone %></strong><br>
-                                                                                        <span><%= address.building %></span>,<span><%= address.area %></span><br>
-                                                                                        <span><%= address.city %></span>,<span><%= address.state %></span>,<span><%= address.pincode %></span><br>                                                                                                                                                                        
-                                                                                    </label>
-                                                                                    
-                                                                                </div>
-                                                                                <% }) %>
-
-                                                                            <% } %>
-                                                                                                                                                                                    
-                                                                        </div>                                                                                                                                           
-                                                                       
-                                                                        <input type="hidden" name="productId" value="<%= order.products.product %>">
-                                                                        <input type="hidden" name="orderId" value="<%= order._id %>">
-                                                                        <input type="hidden" name="quantity" value="<%= order.products.quantity %>">
-                                                
-                                                                        <div  class="card-body text-center">
-                                                                           <button class="btn btn-primary" type="submit">REQUEST RETURN</button>
-                                                                        </div>
-                                                            
-                                                                    </form>
-                                                
-                                                                </div>
-                                                              </div>
-                                                            </div>
-                                                        </div><!-- end modal to return -->                                                                                                                                                                                                                            
-                                                      
-                                                  </div>
-    
-                                                </div>  
-
-                                            </div>                                        
-                                    </div>
-                                    
-                                <% }) %>
-                            <% } %>
-
-                            <a href="/shop" style="margin-left: 10px;" class="btn btn-primary" >CONTINUE SHOPPING</a>
-                              
-	                	</div><!-- End .row -->
-	                </div><!-- End .container -->
-                <!-- </div> -->
-            </div><!-- End .page-content -->                    
-        </main><!-- End .main -->
-        
-
-        <!-- modal to cancel order -->
-        <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h6 class="modal-title" id="exampleModalLabel">CANCEL ORDER</h6>
-                </div>
-                <div class="modal-body p-4">
-                    <P> Are you sure you want to cancel this order ?</P>  
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">GO BACK</button>
-                  <button type="button" class="btn btn-primary" id="cancelOrderBtn" >CONFIRM</button>
+                                <div class="card-body text-center">
+                                  <button class="btn btn-primary" type="submit">
+                                    REQUEST RETURN
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- end modal to return -->
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              <% }) %> <% } %>
+
+              <a href="/shop" style="margin-left: 10px" class="btn btn-primary"
+                >CONTINUE SHOPPING</a
+              >
             </div>
+            <!-- End .row -->
+          </div>
+          <!-- End .container -->
+          <!-- </div> -->
         </div>
+        <!-- End .page-content -->
+      </main>
+      <!-- End .main -->
 
+      <!-- modal to cancel order -->
+      <div
+        class="modal fade"
+        id="cancelOrderModal"
+        tabindex="-1"
+        role="dialog"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h6 class="modal-title" id="exampleModalLabel">CANCEL ORDER</h6>
+            </div>
+            <div class="modal-body p-4">
+              <P> Are you sure you want to cancel this order ?</P>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                GO BACK
+              </button>
+              <button type="button" class="btn btn-primary" id="cancelOrderBtn">
+                CONFIRM
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        
-
-        <%- include('./partials/footer') -%>
-
-    </div><!-- End .page-wrapper -->
-    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+      <%- include('./partials/footer') -%>
+    </div>
+    <!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top">
+      <i class="icon-arrow-up"></i>
+    </button>
 
     <!-- Mobile Menu -->
-    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+    <div class="mobile-menu-overlay"></div>
+    <!-- End .mobil-menu-overlay -->
 
     <%- include('./partials/mobileMenu') -%>
 
-    
-    
     <script src="/user/js/jquery.min.js"></script>
     <script src="/user/js/bootstrap.bundle.min.js"></script>
     <script src="/user/js/jquery.hoverIntent.min.js"></script>
@@ -321,76 +453,73 @@
     <script src="/user/js/owl.carousel.min.js"></script>
     <script src="/user/js/bootstrap-input-spinner.js"></script>
     <script src="/user/js/main.js"></script>
-    
+
     <script>
-        let formId; 
+      let formId;
 
-        function openCancelOrderModal(formIdToCancel) {
-            formId = formIdToCancel; 
-        $('#cancelOrderModal').modal('show'); 
-        }
+      function openCancelOrderModal(formIdToCancel) {
+        formId = formIdToCancel;
+        $("#cancelOrderModal").modal("show");
+      }
 
-        $('#cancelOrderBtn').on('click', function() {
-            const form = document.getElementById(formId);
-            form.submit();
-        });
+      $("#cancelOrderBtn").on("click", function () {
+        const form = document.getElementById(formId);
+        form.submit();
+      });
     </script>
-    
-
 
     <script>
-    
-        document.addEventListener('DOMContentLoaded', function () {
-        const returnForms = document.querySelectorAll('.returnForm');
-    
+      document.addEventListener("DOMContentLoaded", function () {
+        const returnForms = document.querySelectorAll(".returnForm");
+
         returnForms.forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                // Get the corresponding elements using class names
-                const reasonRadios = form.querySelectorAll('[name="reason"]');
-                const conditionSelect = form.querySelector('select[name="condition"]');
-                const pickupAddressRadios = form.querySelectorAll('[name="pickupAddress"]');
-    
-                // Get the corresponding error spans
-                const reasonError = form.querySelector('#reasonError');
-                const conditionError = form.querySelector('#conditionError');
-    
-                // Reset previous error messages
-                reasonError.textContent = "";
-                conditionError.textContent = "";
-    
-                // Your validation logic here
-                let hasErrors = false;
-    
-                // Check if at least one reason is selected
-                if (!Array.from(reasonRadios).some(radio => radio.checked)) {
-                    hasErrors = true;
-                    reasonError.textContent = "Please select a reason";
-                }
-    
-                // Check if a condition is selected
-                if (conditionSelect.value === '') {
-                    hasErrors = true;
-                    conditionError.textContent = "Please select a condition";
-                }
-    
-                // Check if at least one pickup address is selected
-                if (!Array.from(pickupAddressRadios).some(radio => radio.checked)) {
-                    hasErrors = true;
-                    // Add an error message if needed for pickup address
-                }
-    
-                if (hasErrors) {
-                    event.preventDefault(); // Prevent the form from submitting if there are errors
-                }
-            });
+          form.addEventListener("submit", function (event) {
+            // Get the corresponding elements using class names
+            const reasonRadios = form.querySelectorAll('[name="reason"]');
+            const conditionSelect = form.querySelector(
+              'select[name="condition"]'
+            );
+            const pickupAddressRadios = form.querySelectorAll(
+              '[name="pickupAddress"]'
+            );
+
+            // Get the corresponding error spans
+            const reasonError = form.querySelector("#reasonError");
+            const conditionError = form.querySelector("#conditionError");
+
+            // Reset previous error messages
+            reasonError.textContent = "";
+            conditionError.textContent = "";
+
+            // Your validation logic here
+            let hasErrors = false;
+
+            // Check if at least one reason is selected
+            if (!Array.from(reasonRadios).some((radio) => radio.checked)) {
+              hasErrors = true;
+              reasonError.textContent = "Please select a reason";
+            }
+
+            // Check if a condition is selected
+            if (conditionSelect.value === "") {
+              hasErrors = true;
+              conditionError.textContent = "Please select a condition";
+            }
+
+            // Check if at least one pickup address is selected
+            if (
+              !Array.from(pickupAddressRadios).some((radio) => radio.checked)
+            ) {
+              hasErrors = true;
+              // Add an error message if needed for pickup address
+            }
+
+            if (hasErrors) {
+              event.preventDefault(); // Prevent the form from submitting if there are errors
+            }
+          });
         });
-    });
-    
+      });
     </script>
-    
-      
-</body>
-
-
-
+  </body>
 </html>

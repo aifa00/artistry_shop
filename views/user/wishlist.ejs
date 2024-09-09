@@ -1,161 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-<!-- molla/category.html  22 Nov 2019 10:02:48 GMT -->
-<head>
+  <!-- molla/category.html  22 Nov 2019 10:02:48 GMT -->
+  <head>
     <%- include('./partials/head') %>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="page-wrapper">
-       <%- include('./partials/header')  %>
-        <main class="main">
-            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
-                <div class="container d-flex align-items-center">
-                    <div class="col-md-12">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Wishlist</li>                                        
-                        </ol>
-                    </div>                    
-                </div>
-            </nav>
-
-
-            <div class="page-content">
-                <div class="container">
-                    <h5>MY WISHLIST</h5>
-                	<div class="row">
-                		<div class="col-lg-12">
-                            <div class="products mb-3">
-                                <div class="row justify-content-center">
-                                    <% if(!foundProducts.length) { %>
-                                        <h5>NO PRODUCTS FOUND</h5>
-                                    <% }else{ %>
-                                        <% foundProducts.forEach((product) => { %>
-                                            <% if(product.category.disabled === false) { %>
-
-                                                <div class="col-6 col-md-3 col-lg-3">
-                                                    <div class="product product-7 text-center">
-
-                                                        <figure class="product-media">
-                                                            
-                                                            <a href="/product/<%= product._id %>">
-                                                                <img src="<%= product.images[0] %>" alt="Product image" class="product-image">
-                                                            </a>                     
-                                                            
-                                                            
-                                                            
-                                                                <div class="product-action-vertical">                                                                                                                                          
-
-                                                                    <button type="button" style="color: white;font-size: 2rem;cursor: pointer;background: none;border: none;" id="addToWishlist" onclick="removeItem('<%= product._id %>')">
-                                                                        <i class="bi bi-x-lg"></i>
-                                                                    </button>
-                                                                    
-                                                                </div>
-                                                            
-
-                                                            
-                                                            <form class="addToCartForm" action="/add-to-cart" method="post">
-                                                            <div class="product-action">
-                                                                <% if(!product.stock) { %>
-                                                                    <a href="#" class="btn-product"><span>Currently Unavailable</span></a>                                      
-                                                                <% } else { %>
-                                                                    
-                                                                        <% if (currentUser && currentUser.cart.some(item => item.product.toString() === product._id.toString() )) { %>
-                                                                            <a href="/cart" class="btn-product btn-cart"><span>Go To Cart</span></a>
-                                                                        <% } else { %>
-                                                                            <input type="hidden" name="product" value="<%= product._id %>">
-                                                                            <input type="hidden" name="fixedQuantity" value="1"> 
-                                                                            <input type="hidden" name="from" value="wishlist">
-                                                                            <button type="submit" class="btn btn-product btn-cart" id="addToCartBtn<%= product._id %>" >
-                                                                                <span>Add To Cart</span>
-                                                                            </button>
-                                                                        <% } %>   
-
-                                                                <% } %>
-                                                            </div>
-                                                            </form>
-
-                                                        </figure>
-        
-                                                        <div class="product-body text-center">
-                                                            <div class="product-cat">
-                                                                <a href="#"><%= product.category.name %></a>
-                                                            </div>
-
-                                                            <h3 class="product-title mb-1" style="font-size: 1.8rem; font-weight: 400;"><a href="/product/<%= product._id %>"><%= product.title %></a></h3><!-- End .product-title -->
-
-                                                            <%  if(!product.stock) { %>
-                                                                <div  style="display: inline-block;">
-                                                                    <p class="text-danger">Currently Unavailable</p>
-                                                                </div>
-
-                                                            <% } else { %>
-
-                                                                <div>
-                                                                    <% let discountPercentage = 0; %>
-                                                                    <% const currentDate = new Date() %>
-                            
-                                                                    <% if (product.isOfferActive && currentDate <= product.offerValidUpto) { %>   
-                                                                        <% discountPercentage += product.offerPercentage %>
-                                                                    <% } %> 
-                            
-                                                                    <% if (product.category.isOfferActive && currentDate <= product.category.offerValidUpto) { %>   
-                                                                        <% discountPercentage += product.category.offerPercentage %>
-                                                                    <% } %> 
-                            
-                                                                    <% if (discountPercentage > 90) { %>
-                                                                        <% discountPercentage = 90 %>
-                                                                    <% } %>
-                            
-                            
-                                                                    <% if (discountPercentage !== undefined && discountPercentage !== null && discountPercentage !== 0 && discountPercentage <= 90) { %>   
-                                                                        <% const discountedPrice = product.price - (discountPercentage/100) * product.price %>  
-                                                                        <h6>
-                                                                            <span>&#8377; <%= discountedPrice %></span>
-                                                                            <small style="text-decoration: line-through;color:#999;">&#8377; <%= product.price %></small>
-                                                                            <small class="text-success">(<%= discountPercentage %>% OFF)</small>
-                                                                        </h6>                                
-                                                                        
-                            
-                                                                    <% } else { %>
-                                                                        <h6>&#8377; <%= product.price %></h6>
-                                                                    <% } %> 
-                                                                    
-                                                                </div>
-
-                                                            <% } %>
-                                                                                                                                                                
-                                                        </div>                                                        
-                                                    </div>
-                                                </div>
-                                            <% } %>
-                                        <% }) %>
-                                    <% } %>                            
-                                </div><!-- End .row -->
-                            </div><!-- End .products -->
-
-                            
-                            
-                		</div>
-
-                		
-                	</div>
-                </div>
+      <%- include('./partials/header') %>
+      <main class="main">
+        <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+          <div class="container d-flex align-items-center">
+            <div class="col-md-12">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                  Wishlist
+                </li>
+              </ol>
             </div>
-        </main>
-        <%- include('./partials/footer') -%>
-    </div><!-- End .page-wrapper -->
+          </div>
+        </nav>
 
-    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+        <div class="page-content">
+          <div class="container">
+            <h5>MY WISHLIST</h5>
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="products mb-3">
+                  <div class="row justify-content-center">
+                    <% if(!foundProducts.length) { %>
+                    <h5>NO PRODUCTS FOUND</h5>
+                    <% }else{ %> <% foundProducts.forEach((product) => { %> <%
+                    if(product.category.disabled === false) { %>
+
+                    <div class="col-6 col-md-3 col-lg-3">
+                      <div class="product product-7 text-center">
+                        <figure class="product-media">
+                          <a href="/product/<%= product._id %>">
+                            <img
+                              src="<%= product.images[0] %>"
+                              alt="Product image"
+                              class="product-image"
+                            />
+                          </a>
+
+                          <div class="product-action-vertical">
+                            <button
+                              type="button"
+                              style="
+                                color: white;
+                                font-size: 2rem;
+                                cursor: pointer;
+                                background: none;
+                                border: none;
+                              "
+                              id="addToWishlist"
+                              onclick="removeItem('<%= product._id %>')"
+                            >
+                              <i class="bi bi-x-lg"></i>
+                            </button>
+                          </div>
+
+                          <form
+                            class="addToCartForm"
+                            action="/add-to-cart"
+                            method="post"
+                          >
+                            <div class="product-action">
+                              <% if(!product.stock) { %>
+                              <a href="#" class="btn-product"
+                                ><span>Currently Unavailable</span></a
+                              >
+                              <% } else { %> <% if (currentUser &&
+                              currentUser.cart.some(item =>
+                              item.product.toString() === product._id.toString()
+                              )) { %>
+                              <a href="/cart" class="btn-product btn-cart"
+                                ><span>Go To Cart</span></a
+                              >
+                              <% } else { %>
+                              <input
+                                type="hidden"
+                                name="product"
+                                value="<%= product._id %>"
+                              />
+                              <input
+                                type="hidden"
+                                name="fixedQuantity"
+                                value="1"
+                              />
+                              <input
+                                type="hidden"
+                                name="from"
+                                value="wishlist"
+                              />
+                              <button
+                                type="submit"
+                                class="btn btn-product btn-cart"
+                                id="addToCartBtn<%= product._id %>"
+                              >
+                                <span>Add To Cart</span>
+                              </button>
+                              <% } %> <% } %>
+                            </div>
+                          </form>
+                        </figure>
+
+                        <div class="product-body text-center">
+                          <div class="product-cat">
+                            <a href="#"><%= product.category.name %></a>
+                          </div>
+
+                          <h3
+                            class="product-title mb-1"
+                            style="font-size: 1.8rem; font-weight: 400"
+                          >
+                            <a href="/product/<%= product._id %>"
+                              ><%= product.title %></a
+                            >
+                          </h3>
+                          <!-- End .product-title -->
+
+                          <% if(!product.stock) { %>
+                          <div style="display: inline-block">
+                            <p class="text-danger">Currently Unavailable</p>
+                          </div>
+
+                          <% } else { %>
+
+                          <div>
+                            <% let discountPercentage = 0; %> <% const
+                            currentDate = new Date() %> <% if
+                            (product.isOfferActive && currentDate <=
+                            product.offerValidUpto) { %> <% discountPercentage
+                            += product.offerPercentage %> <% } %> <% if
+                            (product.category.isOfferActive && currentDate <=
+                            product.category.offerValidUpto) { %> <%
+                            discountPercentage +=
+                            product.category.offerPercentage %> <% } %> <% if
+                            (discountPercentage > 90) { %> <% discountPercentage
+                            = 90 %> <% } %> <% if (discountPercentage !==
+                            undefined && discountPercentage !== null &&
+                            discountPercentage !== 0 && discountPercentage <=
+                            90) { %> <% const discountedPrice = product.price -
+                            (discountPercentage/100) * product.price %>
+                            <h6>
+                              <span>&#8377; <%= discountedPrice %></span>
+                              <small
+                                style="
+                                  text-decoration: line-through;
+                                  color: #999;
+                                "
+                                >&#8377; <%= product.price %></small
+                              >
+                              <small class="text-success"
+                                >(<%= discountPercentage %>% OFF)</small
+                              >
+                            </h6>
+
+                            <% } else { %>
+                            <h6>&#8377; <%= product.price %></h6>
+                            <% } %>
+                          </div>
+
+                          <% } %>
+                        </div>
+                      </div>
+                    </div>
+                    <% } %> <% }) %> <% } %>
+                  </div>
+                  <!-- End .row -->
+                </div>
+                <!-- End .products -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <%- include('./partials/footer') -%>
+    </div>
+    <!-- End .page-wrapper -->
+
+    <button id="scroll-top" title="Back to Top">
+      <i class="icon-arrow-up"></i>
+    </button>
     <!-- Mobile Menu -->
     <div class="mobile-menu-overlay"></div>
     <%- include('./partials/mobileMenu') -%>
-
-    
 
     <script src="/user/js/jquery.min.js"></script>
     <script src="/user/js/bootstrap.bundle.min.js"></script>
@@ -169,56 +202,46 @@
     <script src="/user/js/nouislider.min.js"></script>
     <script src="/user/js/main.js"></script>
 
-    
-   
     <script>
-    $(document).ready(function() {
+      $(document).ready(function () {
         // Handle the form submission with AJAX
-        $('.addToCartForm').submit(function(event) {
-            // Prevent the default form submission
-            event.preventDefault();
+        $(".addToCartForm").submit(function (event) {
+          // Prevent the default form submission
+          event.preventDefault();
 
-            // Collect form data
-            var formData = $(this).serialize();
-            console.log(formData);
+          // Collect form data
+          var formData = $(this).serialize();
 
-            // Make an AJAX request
-            $.ajax({
-                url: '/add-to-cart',
-                type: 'POST',
-                dataType: 'json',
-                data: formData,
-                success: function(response) {
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors
-                    console.error('Error:', error);
-                }
-            });
+          // Make an AJAX request
+          $.ajax({
+            url: "/add-to-cart",
+            type: "POST",
+            dataType: "json",
+            data: formData,
+            success: function (response) {
+              location.reload();
+            },
+            error: function (xhr, status, error) {
+              // Handle errors
+              console.error("Error:", error);
+            },
+          });
         });
-    });
-    
-    </script>    
-    <script>
-        function removeItem(productId) {
-
-            console.log("button is triggered", productId)
-
-            $.ajax({
-                url: '/remove-from-wishlist/' + productId,
-                type: 'POST',
-                success: function(response) {
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.log(error);
-                }
-            });
-        }
+      });
     </script>
-
-
-
-</body>
+    <script>
+      function removeItem(productId) {
+        $.ajax({
+          url: "/remove-from-wishlist/" + productId,
+          type: "POST",
+          success: function (response) {
+            location.reload();
+          },
+          error: function (xhr, status, error) {
+            console.log(error);
+          },
+        });
+      }
+    </script>
+  </body>
 </html>
