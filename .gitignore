@@ -1,2 +1,9 @@
-# .gitignore
+# .env
 .env
+
+# Node.js dependencies
+node_modules/
+
+
+# General cache and log files
+*.log
