@@ -7,3 +7,6 @@ node_modules/
 
 # General cache and log files
 *.log
+
+# 
+.platform/
