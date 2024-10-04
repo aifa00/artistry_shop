@@ -1,12 +1,10 @@
 import Category from "../../models/categoryModel.js";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import path from "path";
-import { dirname } from "path";
 import logger from "../../utils/logger.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import {
+  deleteFileFromS3,
+  getPreSignedUrl,
+  uploadFileToS3,
+} from "../../utils/s3Utils.js";
 
 export const getCategories = async (req, res, next) => {
   try {
@@ -17,7 +15,17 @@ export const getCategories = async (req, res, next) => {
     const totalCategories = await Category.countDocuments();
     const totalPages = Math.ceil(totalCategories / pageSize);
 
-    const foundCategories = await Category.find().skip(skip).limit(pageSize);
+    let foundCategories = await Category.find().skip(skip).limit(pageSize);
+
+    foundCategories = await Promise.all(
+      foundCategories.map(async (category) => {
+        const imageUrl = await getPreSignedUrl(category.image);
+        return {
+          ...category.toObject(),
+          image: imageUrl,
+        };
+      })
+    );
 
     res.render("admin/category/categories", {
       categoryDatas: foundCategories,
@@ -41,7 +49,9 @@ export const getNewCategory = (req, res) => {
 //post new category
 export const addNewCategory = async (req, res, next) => {
   try {
-    const { name, image, offerPercentage, offerValidUpto } = req.body;
+    const { name, offerPercentage, offerValidUpto } = req.body;
+    const image = req.file;
+
     if (!name || !image) {
       res.render("admin/category/newCategory", {
         error: "PLease fill in all fields",
@@ -60,9 +70,15 @@ export const addNewCategory = async (req, res, next) => {
       });
     }
 
+    let imageKey = "";
+    if (image) {
+      const folder = "category";
+      imageKey = await uploadFileToS3(image, folder);
+    }
+
     const categoryData = {
       name,
-      image: "/categories/" + image,
+      image: imageKey,
     };
 
     // Add offerPercentage and offerValidUpto to categoryData if provided
@@ -114,6 +130,10 @@ export const getEditCategory = async (req, res, next) => {
   try {
     const foundCategory = await Category.findById(req.params.id);
 
+    const imageUrl = await getPreSignedUrl(foundCategory.image);
+
+    foundCategory.image = imageUrl;
+
     if (!foundCategory) {
       logger.info("no category found");
     } else {
@@ -130,26 +150,21 @@ export const getEditCategory = async (req, res, next) => {
 
 export const editCategory = async (req, res, next) => {
   const { id } = req.params;
-  const { name, image, offerPercentage, offerValidUpto } = req.body;
+  const { name, offerPercentage, offerValidUpto } = req.body;
+  const image = req.file;
+
   const foundCategory = await Category.findById(id);
+
   try {
     let updatedData = {
       name,
     };
 
-    if (typeof image !== "undefined") {
-      fs.unlink(
-        path.join(__dirname, "../../public", foundCategory.image),
-        (err) => {
-          if (err) {
-            logger.log({
-              level: "error",
-              message: err,
-            });
-          }
-        }
-      );
-      updatedData.image = "/categories/" + image;
+    if (image) {
+      await deleteFileFromS3(foundCategory.image);
+      const folder = "category";
+      const newKey = await uploadFileToS3(image, folder);
+      updatedData.image = newKey;
     }
 
     if (offerPercentage && offerValidUpto) {

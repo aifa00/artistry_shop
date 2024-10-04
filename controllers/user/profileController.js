@@ -6,19 +6,28 @@ import {
 import { sendToMail } from "../../utils/sendMail.js";
 import User from "../../models/userModel.js";
 import Coupon from "../../models/couponModel.js";
-import fs from "fs";
 import { fileURLToPath } from "url";
-import path from "path";
 import { dirname } from "path";
-import logger from "../../utils/logger.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import {
+  deleteFileFromS3,
+  getPreSignedUrl,
+  uploadFileToS3,
+} from "../../utils/s3Utils.js";
 
 export const getProfile = async (req, res, next) => {
   try {
-    const currentUser = await getCurrentUser(req, res);
+    let currentUser = await getCurrentUser(req, res);
     const address = await Address.find({ user: req.session.user });
+
+    if (currentUser) {
+      if (currentUser.profile && currentUser.profile !== "") {
+        const imageUrl = await getPreSignedUrl(currentUser.profile);
+        currentUser = {
+          ...currentUser.toObject(),
+          profile: imageUrl,
+        };
+      }
+    }
 
     const referralLink = generateReferralLink(currentUser.referralCode);
 
@@ -41,10 +50,11 @@ const generateReferralLink = (referralCode) => {
 
 //update profile
 export const updateProfile = async (req, res, next) => {
-  const { profile, name, email, phone } = req.body;
-  const address = await Address.find({ user: req.session.user }); //to render
-
   try {
+    const { name, email, phone } = req.body;
+    const profile = req.file;
+    const address = await Address.find({ user: req.session.user });
+
     if (!name || !email || !phone) {
       res.render("user/profile", {
         isLoggedIn: isLoggedIn(req, res),
@@ -54,7 +64,9 @@ export const updateProfile = async (req, res, next) => {
         message: "",
       });
     } else {
-      const currentUser = await User.findById(req.session.user); //inorder to check if any other user otherthan this exist
+      const currentUser = await User.findById(req.session.user);
+
+      const prevEmail = currentUser.email;
 
       const userWithSameEmail = await User.findOne({
         _id: { $ne: currentUser._id },
@@ -81,35 +93,22 @@ export const updateProfile = async (req, res, next) => {
         return res.redirect("/profile");
       }
 
-      //manage updation
-      let updatedData = {
-        name,
-        email,
-        phone,
-      };
-      //chack whether profile image is present
-      if (typeof profile !== "undefined") {
+      currentUser.name = name;
+      currentUser.email = email;
+      currentUser.phone = phone;
+
+      if (profile) {
         if (currentUser.profile) {
-          fs.unlink(
-            path.join(__dirname, "../../public", currentUser.profile),
-            (err) => {
-              if (err) {
-                logger.log({
-                  level: "error",
-                  message: err,
-                });
-              }
-            }
-          );
+          await deleteFileFromS3(currentUser.profile);
         }
-
-        updatedData.profile = "/profiles/" + profile;
+        const folder = "profile";
+        const imageKey = await uploadFileToS3(profile, folder);
+        currentUser.profile = imageKey;
       }
-      //update
-      await currentUser.updateOne(updatedData);
 
-      //updated email may not be verified
-      if (currentUser.email !== email) {
+      await currentUser.save();
+
+      if (prevEmail !== email) {
         currentUser.verified = false;
         await currentUser.save();
         sendToMail(req, res, req.session.user, false, next);
@@ -132,24 +131,12 @@ export const removeProfileImage = async (req, res, next) => {
   try {
     const currentUser = await User.findById(req.session.user);
 
-    if (currentUser.profile) {
-      fs.unlink(
-        path.join(__dirname, "../../public", currentUser.profile),
-        (err) => {
-          if (err) {
-            logger.log({
-              level: "error",
-              message: err,
-            });
-          }
-        }
-      );
+    if (currentUser) {
+      await deleteFileFromS3(currentUser.profile);
+      currentUser.profile = "";
+      await currentUser.save();
     }
-    let removeImage = {
-      profile: "",
-    };
 
-    await currentUser.updateOne(removeImage);
     res.redirect("/profile");
   } catch (error) {
     next(error);

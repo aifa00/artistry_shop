@@ -10,6 +10,7 @@ import Order from "../../models/orderModel.js";
 import Coupon from "../../models/couponModel.js";
 import { sendToMail } from "../../utils/sendMail.js";
 import createInvoice from "../../utils/invoice.js";
+import { getPreSignedUrl } from "../../utils/s3Utils.js";
 
 export const addToCart = async (req, res, next) => {
   try {
@@ -63,7 +64,7 @@ export const getCart = async (req, res, next) => {
       await currentUser.populate("cart.product");
       await currentUser.populate("cart.product.category");
 
-      const cartProducts = currentUser.cart;
+      let cartProducts = currentUser.cart;
 
       //find subtotal
       let subTotal = 0;
@@ -109,6 +110,32 @@ export const getCart = async (req, res, next) => {
       const totalMrp = cartProducts.reduce((total, element) => {
         return total + element.quantity * element.product.price;
       }, 0);
+
+      if (cartProducts) {
+        cartProducts = await Promise.all(
+          cartProducts.map(async (obj) => {
+            // Get url of one image
+            const imageUrl = await getPreSignedUrl(obj.product.images[0]);
+            return {
+              ...obj.toObject(),
+              product: {
+                title: obj.product.title,
+                stock: obj.product.stock,
+                offerPercentage: obj.product.offerPercentage,
+                isOfferActive: obj.product.isOfferActive,
+                offerValidUpto: obj.product.offerValidUpto,
+                category: {
+                  offerPercentage: obj.product.category.offerPercentage,
+                  isOfferActive: obj.product.category.isOfferActive,
+                  offerValidUpto: obj.product.category.offerValidUpto,
+                },
+                images: [imageUrl],
+                price: obj.product.price,
+              },
+            };
+          })
+        );
+      }
 
       res.render("user/cart", {
         isLoggedIn: isLoggedIn(req, res),
@@ -582,20 +609,44 @@ export const getOrders = async (req, res, next) => {
   try {
     const addresses = await Address.find({ user: req.session.user });
 
-    const orders = await Order.aggregate([
+    let orders = await Order.aggregate([
       { $match: { user: new mongoose.Types.ObjectId(req.session.user) } },
       { $unwind: "$products" },
-      // creating a separate document for each product in an order.
       {
         $lookup: {
-          from: "products", //  search for matching documents in the "Product" collection.
-          localField: "products.product", // contains the value to match against the foreign collection
-          foreignField: "_id", // field from the foreign collection ("products" collection) that the localField will match against.
-          as: "orderedProducts", // an array containing documents from the "products" collection that satisfy the lookup conditions
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "orderedProducts",
         },
       },
       { $sort: { orderDate: -1 } },
     ]);
+
+    orders = await Promise.all(
+      orders.map(async (order) => {
+        const imageUrl = await getPreSignedUrl(
+          order.orderedProducts[0].images[0]
+        );
+
+        return {
+          _id: order._id,
+          products: {
+            ...order.products,
+          },
+          deliveryDate: order.deliveryDate,
+          orderedProducts: [
+            {
+              _id: order.orderedProducts[0]._id,
+              title: order.orderedProducts[0].title,
+              price: order.orderedProducts[0].price,
+              quantity: order.orderedProducts[0].quantity,
+              images: [imageUrl],
+            },
+          ],
+        };
+      })
+    );
 
     res.render("user/orders", {
       isLoggedIn: isLoggedIn(req, res),
@@ -706,7 +757,7 @@ export const cancelOrder = async (req, res, next) => {
 //get single order
 export const getSingleOrder = async (req, res, next) => {
   try {
-    const foundOrder = await Order.aggregate([
+    let foundOrder = await Order.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(req.params.orderId) } },
       { $unwind: "$products" },
       {
@@ -718,14 +769,6 @@ export const getSingleOrder = async (req, res, next) => {
         },
       },
       {
-        $addFields: {
-          "products.populatedProduct": {
-            $arrayElemAt: ["$populatedProduct", 0],
-          },
-        },
-      },
-
-      {
         $match: {
           "populatedProduct._id": new mongoose.Types.ObjectId(
             req.params.productId
@@ -734,9 +777,36 @@ export const getSingleOrder = async (req, res, next) => {
       },
     ]);
 
+    if (!foundOrder || foundOrder.length === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    let imageUrl = foundOrder[0]?.populatedProduct[0]?.images[0];
+
+    if (imageUrl) {
+      imageUrl = await getPreSignedUrl(imageUrl);
+    }
+
+    console.log("FOUND ORDER: ", foundOrder);
+
+    const updatedOrder = {
+      ...foundOrder[0],
+      populatedProduct: [
+        {
+          title: foundOrder[0].populatedProduct[0].title,
+          description: foundOrder[0].populatedProduct[0].description,
+          images: [imageUrl],
+          price: foundOrder[0].populatedProduct[0].price,
+          stock: foundOrder[0].populatedProduct[0].stock,
+        },
+      ],
+    };
+
+    console.log("UPDATED ORDER: ", updatedOrder);
+
     res.render("user/singleOrder", {
       isLoggedIn: isLoggedIn(req, res),
-      foundOrder: foundOrder[0],
+      foundOrder: updatedOrder,
     });
   } catch (error) {
     next();

@@ -1,17 +1,10 @@
 import multer from "multer";
 import sharp from "sharp";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import { v4 } from "uuid";
 import logger from "../utils/logger.js";
-
-//find the directory of the current module file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 //memory storage of multer
 const storage = multer.memoryStorage();
+
 //filter image files
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
@@ -32,18 +25,19 @@ export const resizeCategoryImage = async (req, res, next) => {
   try {
     if (!req.file) return next();
 
-    req.file.originalname = "category-" + v4() + ".png";
+    const file = req.file.image;
 
-    req.body.image = req.file.originalname;
-
-    await sharp(req.file.buffer)
+    const processedBuffer = await sharp(file.buffer)
       .resize(500, 500)
-      .toFormat("png")
-      .png({ quality: 90 })
-      .toFile(
-        path.join(__dirname, "../public", "categories", req.file.originalname)
-      );
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toBuffer();
 
+    req.file = {
+      originalname: file.originalname,
+      buffer: processedBuffer,
+      mimetype: "image/jpeg",
+    };
     next();
   } catch (error) {
     next();
@@ -61,23 +55,27 @@ export const uploadProductImages = upload.fields([
 //resize product image
 export const resizeProductImages = async (req, res, next) => {
   try {
-    if (!req.files.images) return next();
+    const images = req.files.images;
 
-    req.body.images = [];
+    if (!images) return next();
 
-    await Promise.all(
-      req.files.images.map(async (file) => {
-        const filename = "product-" + v4() + ".jpeg";
-
-        await sharp(file.buffer)
+    const processedFiles = await Promise.all(
+      images.map(async (file) => {
+        const processedBuffer = await sharp(file.buffer)
           .resize(500, 500)
           .toFormat("jpeg")
           .jpeg({ quality: 90 })
-          .toFile(path.join(__dirname, "../public", "products", filename));
+          .toBuffer();
 
-        req.body.images.push(filename);
+        return {
+          originalname: file.originalname,
+          buffer: processedBuffer,
+          mimetype: "image/jpeg",
+        };
       })
     );
+
+    req.files = processedFiles;
     next();
   } catch (error) {
     next(error);
@@ -90,19 +88,24 @@ export const uploadProfileImage = upload.single("profile");
 //resize profile image
 export const resizeProfileImage = async (req, res, next) => {
   try {
-    if (!req.file) return next();
+    const file = req.file;
 
-    req.file.originalname = "profile-" + v4() + ".png";
+    if (!file) return next();
 
-    req.body.profile = req.file.originalname;
+    const processedBuffer = await sharp(file.buffer)
+      .resize(500, 500, {
+        fit: sharp.fit.cover,
+        position: "center",
+      })
+      .toFormat("jpeg")
+      .jpeg({ quality: 50 })
+      .toBuffer();
 
-    await sharp(req.file.buffer)
-      .resize(200, 200)
-      .toFormat("png")
-      .png({ quality: 90 })
-      .toFile(
-        path.join(__dirname, "../public", "profiles", req.file.originalname)
-      );
+    req.file = {
+      originalname: file.originalname,
+      buffer: processedBuffer,
+      mimetype: "image/jpeg",
+    };
     next();
   } catch (error) {
     logger.log({
@@ -112,29 +115,22 @@ export const resizeProfileImage = async (req, res, next) => {
   }
 };
 
-export const uploadBannerImages = upload.fields([
-  {
-    name: "images",
-    maxCount: 3,
-  },
-]);
+export const uploadBannerImage = upload.single("image");
 
-export const resizeBannerImages = async (req, res, next) => {
-  if (!req.files.images) return next();
+export const resizeBannerImage = async (req, res, next) => {
+  const file = req.file.image;
+  if (!file) return next();
 
-  req.body.images = [];
+  const processedBuffer = await sharp(file.buffer)
+    .resize(1920, 1080)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toBuffer();
 
-  await Promise.all(
-    req.files.images.map(async (file) => {
-      const filename = "banner-" + v4() + ".jpeg";
-
-      await sharp(file.buffer)
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(path.join(__dirname, "../public", "banners", filename));
-
-      req.body.images.push(filename);
-    })
-  );
+  req.file = {
+    originalname: file.originalname,
+    buffer: processedBuffer,
+    mimetype: "image/jpeg",
+  };
   next();
 };

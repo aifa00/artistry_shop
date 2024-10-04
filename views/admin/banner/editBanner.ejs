@@ -18,7 +18,7 @@
             <div class="container-fluid pt-4 px-4 vh-100" style="max-width:80%;">
                 <div class="row g-4 p-4">
 
-                    <form class="forms-sample" id="addBannerForm" action="/admin/edit-banner/<%= foundBanner._id %>?_method=PATCH" method="post">
+                    <form class="forms-sample" id="addBannerForm" action="/admin/edit-banner/<%= foundBanner._id %>?_method=PATCH" enctype="multipart/form-data" method="post">
                         <h4 class="text-dark">EDIT BANNER</h4>
 
                         <div class="form-group my-2">
@@ -56,44 +56,23 @@
                         <div class="form-group">
                           <span class="text-primary" id="error" style="font-weight: 700;font-size: 13px;"><%= error %></span>
                         </div>
+    
+                        
+                        <div class="form-group my-3">
+                          <label for="image">Image upload</label>
+                          <input type="file" accept="image/*" class="form-control" id="imageInput" name="image" style="background: transparent;">
+                        </div>
 
+
+
+                        <div class="form-group" id="previewImage" style="width: 250px; height: 100px;">
+                            <div class="card">                    
+                              <img src="<%= foundBanner.image %>" alt="img" class="preview" id="image-card" style="object-fit: cover; width: 250px; height: 100px;">                            
+                            </div>
+                        </div>
                         
                         <button type="submit" class="btn btn-primary px-5 mt-2"> EDIT BANNER </button>
-                    </form>
-                    
-                    
-
-                    <!-- previous banner images -->
-                    <div class="d-flex flex-wrap">
-
-                        <% for(let i = 0 ; i < 3 ; i++ ) { %>
-                          <!-- product image 3 -->
-                          <div class="col-md-2 me-2">
-                            <div class="card text-center" id="previewImage">
-                              <% if (foundBanner.images[i]) { %>
-                                <form action="/admin/banner/delete-image/<%= foundBanner._id %>?_method=DELETE" method="post">
-                                  
-                                  <img src="<%= foundBanner.images[i] %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
-                                  <input type="hidden" name="image" value="<%= foundBanner.images[i] %>">
-                                  
-                                  <button class="btn text-primary" style="font-size: 13px; font-weight: 600;">Delete<i class="bi bi-trash"></i></button>
-                                </form>
-                              <% } else { %>     
-                                <form action="/admin/banner/add-image/<%= foundBanner._id %>?_method=PATCH" method="post" enctype="multipart/form-data" id="addImageForm">
-                                    <label for="newImageInput">
-                                        <img src="https://png.pngtree.com/element_our/20190601/ourmid/pngtree-white-upload-icon-image_1338667.jpg" alt="img" class="preview img-fluid" id="uploadImage" style="object-fit: cover; max-height: 150px; max-width: 150px;"/>
-                                    </label>
-                                    <input type="file" name="images" accept="image/*" style="display: none;" id="newImageInput" >
-                                  <button class="btn" style="font-size: 13px; font-weight: 600; color: blue;">Save<i class="bi bi-cloud-upload-fill"></i></button>
-                                </form>
-                              <% } %>
-                            </div>
-                          </div>
-                        <% } %>
-                      
-                      </div>
-
-
+                    </form>                
                 </div>
             </div>
         
@@ -104,105 +83,100 @@
         </div>
         
     </div>
+
+    
     
 <script>
+  const addImageForm = document.getElementById('addImageForm');
+  const newImageInput = document.getElementById('newImageInput')
+  const addBannerForm = document.getElementById('addBannerForm');
+  const title = document.getElementById('title');
+  const description = document.getElementById('description');
+  const bannerType = document.getElementById('bannerType');
+  const url = document.getElementById('url');
+  const bannerImages = document.getElementById('bannerImages');
 
-const addBannerForm = document.getElementById('addBannerForm');
-const title = document.getElementById('title');
-const description = document.getElementById('description');
-const bannerType = document.getElementById('bannerType');
-const url = document.getElementById('url');
-const bannerImages = document.getElementById('bannerImages');
+  addImageForm.addEventListener('submit', (event) => {
+    document.getElementById("bannerImagesError").innerHTML = "PLease select an image";
+    if (newImageInput.files.length <= 0) event.preventDefault();  
+  })
 
-addBannerForm.addEventListener('submit', (event) => {
+  addBannerForm.addEventListener('submit', (event) => {
+    // set has errors false by default
+    let hasErrors = false;
 
-
-  // set has errors false by default
-  let hasErrors = false;
-
-  // clear previous messages
-  document.getElementById("error").innerHTML = "";
-  document.getElementById("titleError").innerHTML = "";
-  document.getElementById("descriptionError").innerHTML = "";
-  document.getElementById("bannerTypeError").innerHTML = "";
-  document.getElementById("urlError").innerHTML = "";
-  document.getElementById("bannerImagesError").innerHTML = "";
-
-  
-    if(!title.value) {
-      hasErrors = true;
-      document.getElementById("titleError").innerHTML = "This field is required";
-    } else if (!title.value.match(/^[A-Za-z0-9\s.,:;%]+$/)) {
-      hasErrors = true;
-      document.getElementById("titleError").innerHTML = "Title must not contain special characters";
-    } else if(title.value.length < 3 || title.value.length > 50){
-      hasErrors = true;
-      document.getElementById('titleError').innerHTML = "Title should be between three to fifty characters"
-    }
-
-    if (!description.value) {
-      hasErrors = true;
-      document.getElementById('descriptionError').innerHTML = "This field is required"
-    } else if (description.value.length < 5 || description.value.length > 100){
-      hasErrors = true;
-      document.getElementById('descriptionError').innerHTML = "Description should be between five to hundred cahracters";
-    } else if (title.value == description.value) {
-      hasErrors = true;
-      document.getElementById("descriptionError").innerHTML = "Banner name and description can't be same";
-    }
+    // clear previous messages
+    document.getElementById("error").innerHTML = "";
+    document.getElementById("titleError").innerHTML = "";
+    document.getElementById("descriptionError").innerHTML = "";
+    document.getElementById("bannerTypeError").innerHTML = "";
+    document.getElementById("urlError").innerHTML = "";
+    document.getElementById("bannerImagesError").innerHTML = "";
 
     
-    if (!bannerType.value) {
-      hasErrors = true;
-      document.getElementById("bannerTypeError").innerHTML = "This filed is required";
-    }
+      if(!title.value) {
+        hasErrors = true;
+        document.getElementById("titleError").innerHTML = "This field is required";
+      } else if (!title.value.match(/^[A-Za-z0-9\s.,:;%]+$/)) {
+        hasErrors = true;
+        document.getElementById("titleError").innerHTML = "Title must not contain special characters";
+      } else if(title.value.length < 3 || title.value.length > 50){
+        hasErrors = true;
+        document.getElementById('titleError').innerHTML = "Title should be between three to fifty characters"
+      }
 
-    // if (!url.value) {
-    //   hasErrors = true;
-    //   document.getElementById("urlError").innerHTML = "This filed is required";
-    // }
+      if (!description.value) {
+        hasErrors = true;
+        document.getElementById('descriptionError').innerHTML = "This field is required"
+      } else if (description.value.length < 5 || description.value.length > 100){
+        hasErrors = true;
+        document.getElementById('descriptionError').innerHTML = "Description should be between five to hundred cahracters";
+      } else if (title.value == description.value) {
+        hasErrors = true;
+        document.getElementById("descriptionError").innerHTML = "Banner name and description can't be same";
+      }
+
+      
+      if (!bannerType.value) {
+        hasErrors = true;
+        document.getElementById("bannerTypeError").innerHTML = "This filed is required";
+      }
     
-   
-    if (!bannerImages.value) {
-      hasErrors = true;
-      document.getElementById("bannerImagesError").innerHTML = "This field is required";
-    }
+      // prevent submission if has error is true
+      if (hasErrors) {
+        event.preventDefault();
+      }
 
-  // prevent submission if has error is true
-  if (hasErrors) {
-    event.preventDefault();
+  });         
+</script>
+
+<script>
+  const imageInput = document.getElementById('imageInput');      
+  const image = document.getElementById('image-card');
+
+  imageInput.onchange = e => {
+    console.log('entered in the block');
+    
+    if (e.target.files && e.target.files.length) {
+    console.log('files detected');
+
+      const newImageSrc = URL.createObjectURL(e.target.files[0]);            
+      image.src = newImageSrc;
+    }
   }
+</script>
+  
 
-});
-
-    
-
-            //image upload 
-             
-
-            bannerImages.addEventListener('change', function(event) {
-
-              if (bannerImages.files.length > 3) {
-                hasErrors = true;
-                bannerImages.value = ''; 
-                document.getElementById("bannerImagesError").innerHTML = "You can only select up to three images.";
-              } 
-                       
-
-            });
-            
-    </script>
-
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/admin/lib/chart/chart.min.js"></script>
-    <script src="/admin/lib/easing/easing.min.js"></script>
-    <script src="/admin/lib/waypoints/waypoints.min.js"></script>
-    <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
-    <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-    <script src="/admin/js/main.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/admin/lib/chart/chart.min.js"></script>
+  <script src="/admin/lib/easing/easing.min.js"></script>
+  <script src="/admin/lib/waypoints/waypoints.min.js"></script>
+  <script src="/admin/lib/owlcarousel/owl.carousel.min.js"></script>
+  <script src="/admin/lib/tempusdominus/js/moment.min.js"></script>
+  <script src="/admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
+  <script src="/admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+  <script src="/admin/js/main.js"></script>
 </body>
 
 </html>

@@ -1,13 +1,10 @@
 import Product from "../../models/productModel.js";
 import Category from "../../models/categoryModel.js";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import path from "path";
-import { dirname } from "path";
-import logger from "../../utils/logger.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import {
+  deleteFileFromS3,
+  getPreSignedUrl,
+  uploadFileToS3,
+} from "../../utils/s3Utils.js";
 
 export const getProducts = async (req, res, next) => {
   try {
@@ -22,6 +19,24 @@ export const getProducts = async (req, res, next) => {
       .populate("category")
       .skip(skip)
       .limit(pageSize);
+
+    if (foundProducts.length > 0) {
+      foundProducts = await Promise.all(
+        foundProducts.map(async (product) => {
+          const images = await Promise.all(
+            product.images.map(async (key) => {
+              const url = await getPreSignedUrl(key);
+              return url;
+            })
+          );
+
+          return {
+            ...product.toObject(),
+            images,
+          };
+        })
+      );
+    }
 
     res.render("admin/products/products", {
       productDatas: foundProducts,
@@ -58,10 +73,12 @@ export const addNewProduct = async (req, res, next) => {
     stock,
     artist,
     color,
-    images,
     offerPercentage,
     offerValidUpto,
   } = req.body;
+
+  const images = req.files;
+
   const foundCategories = await Category.find({}, { name: 1 });
   try {
     const existingProduct = await Product.findOne({
@@ -90,7 +107,13 @@ export const addNewProduct = async (req, res, next) => {
         activePage: "Products",
       });
     } else {
-      const productImages = images.map((img) => "/products/" + img);
+      const folder = "products";
+      const productImages = await Promise.all(
+        images.map(async (img) => {
+          const key = await uploadFileToS3(img, folder);
+          return key;
+        })
+      );
 
       const productData = {
         title,
@@ -130,23 +153,6 @@ export const addNewProduct = async (req, res, next) => {
     if (error.code === 11000) {
       hasError = true;
       message = "Product with the name already exist.";
-    } else if (
-      error.message.includes("Product validation failed: title: Path `title`")
-    ) {
-      hasError = true;
-      message = "Product name should be between 3 to 60 characters.";
-    } else if (
-      error.message.includes(
-        "Product validation failed: title: Product name must not contain special characters"
-      )
-    ) {
-      hasError = true;
-      message = "Product name must not contain special characters";
-    } else if (
-      error.message.includes("is longer than the maximum allowed length (200).")
-    ) {
-      hasError = true;
-      message = "Product description should be between 5 to 200 characters";
     } else if (
       error.message.includes("Product validation failed: price: Path `price`")
     ) {
@@ -188,9 +194,27 @@ export const addNewProduct = async (req, res, next) => {
 //get edit product
 export const getEditProduct = async (req, res, next) => {
   try {
-    const foundProduct = await Product.findById(req.params.id).populate(
+    let foundProduct = await Product.findById(req.params.id).populate(
       "category"
     );
+
+    if (foundProduct) {
+      const imageUrls = await Promise.all(
+        foundProduct.images.map(async (key) => {
+          const url = await getPreSignedUrl(key);
+          const newObj = {
+            key,
+            url,
+          };
+          return newObj;
+        })
+      );
+
+      foundProduct = {
+        ...foundProduct.toObject(),
+        images: imageUrls,
+      };
+    }
 
     const foundCategories = await Category.find({}, { name: 1 });
 
@@ -293,21 +317,15 @@ export const editProduct = async (req, res, next) => {
 //delete a product image
 export const deleteSingleImage = async (req, res, next) => {
   try {
-    const { image } = req.body;
+    const { key } = req.body;
+
+    await deleteFileFromS3(key);
+
     await Product.findByIdAndUpdate(
       req.params.id,
-      { $pull: { images: image } },
+      { $pull: { images: key } },
       { new: true }
     );
-
-    fs.unlink(path.join(__dirname, "../../public", image), (error) => {
-      if (error) {
-        logger.log({
-          level: "error",
-          message: error,
-        });
-      }
-    });
 
     res.redirect(`/admin/edit-product/${req.params.id}`);
   } catch (error) {
@@ -318,13 +336,14 @@ export const deleteSingleImage = async (req, res, next) => {
 //add a product image
 export const addSingleImage = async (req, res, next) => {
   try {
-    const { images } = req.body;
-    const newProductImage = "/products/" + images;
+    const images = req.files;
+    const folder = "products";
+    const key = await uploadFileToS3(images[0], folder);
 
     if (typeof images !== "undefined") {
       await Product.findByIdAndUpdate(
         req.params.id,
-        { $push: { images: newProductImage } },
+        { $push: { images: key } },
         { new: true }
       );
       res.redirect(`/admin/edit-product/${req.params.id}`);

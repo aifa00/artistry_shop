@@ -238,29 +238,10 @@
           hasErrors = true;
           document.getElementById("passwordError").innerHTML =
             "This field is required";
-        } else if (passwordInput.value.length < 8) {
+        } else if (passwordInput.value.length < 6) {
           hasErrors = true;
           document.getElementById("passwordError").innerHTML =
-            "Password must be at least 8 characters long.";
-        } else {
-          const specialCharacters = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/;
-          if (!specialCharacters.test(passwordInput.value)) {
-            hasErrors = true;
-            document.getElementById("passwordError").innerHTML =
-              "Password must contain special character.";
-          }
-          const capitalLetters = /[A-Z]/;
-          if (!capitalLetters.test(passwordInput.value)) {
-            hasErrors = true;
-            document.getElementById("passwordError").innerHTML =
-              "Password must contain capital letters.";
-          }
-          const smallLetters = /[a-z]/;
-          if (!smallLetters.test(passwordInput.value)) {
-            hasErrors = true;
-            document.getElementById("passwordError").innerHTML =
-              "Password must contain small letters.";
-          }
+            "Password must be at least 6 characters long.";
         }
 
         if (!confirmPasswordInput.value) {
@@ -272,8 +253,6 @@
           document.getElementById("confirmPasswordError").innerHTML =
             "Password and confirm password didn't match.";
         }
-
-        // }
 
         //prevent submission if has error turn true
         if (hasErrors) {

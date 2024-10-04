@@ -3,21 +3,11 @@ import mongoose from "mongoose";
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
-    minLength: 3,
-    maxLength: 60,
-    validate: {
-      validator: function (value) {
-        return /^[A-Za-z0-9\s]+$/.test(value);
-      },
-      message: "Product name must not contain special characters",
-    },
     unique: true,
     required: true,
   },
   description: {
     type: String,
-    minLength: 5,
-    maxLength: 200,
     required: true,
   },
   price: {

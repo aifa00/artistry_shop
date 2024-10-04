@@ -22,8 +22,8 @@ import {
   resizeCategoryImage,
   uploadProductImages,
   resizeProductImages,
-  uploadBannerImages,
-  resizeBannerImages,
+  uploadBannerImage,
+  resizeBannerImage,
 } from "../middlewares/imageUploadMiddleware.js";
 import {
   getNewCategory,
@@ -60,8 +60,6 @@ import {
   getEditBanner,
   editBanner,
   bannerAction,
-  deleteBannerImage,
-  addBannerImage,
 } from "../controllers/admin/bannerController.js";
 
 const router = Router();
@@ -106,7 +104,7 @@ router.get("/products/:page", isAdmin, getProducts);
 router
   .route("/edit-product/:id")
   .get(isAdmin, getEditProduct)
-  .patch(isAdmin, uploadProductImages, resizeProductImages, editProduct);
+  .patch(isAdmin, editProduct);
 
 router.patch("/products/soft-delete/:id", isAdmin, productDelete);
 router.patch("/products/action/offer/:id", isAdmin, productOfferAction);
@@ -151,7 +149,7 @@ router.patch("/coupon/action/:id", isAdmin, couponAction);
 router
   .route("/add-banner")
   .get(isAdmin, getAddNewBanner)
-  .post(isAdmin, uploadBannerImages, resizeBannerImages, addNewBanner);
+  .post(isAdmin, uploadBannerImage, resizeBannerImage, addNewBanner);
 
 router
   .route("/banners/:page")
@@ -161,17 +159,7 @@ router
 router
   .route("/edit-banner/:id")
   .get(isAdmin, getEditBanner)
-  .patch(isAdmin, editBanner);
-
-router.delete("/banner/delete-image/:id", isAdmin, deleteBannerImage);
-
-router.patch(
-  "/banner/add-image/:id",
-  isAdmin,
-  uploadBannerImages,
-  resizeBannerImages,
-  addBannerImage
-);
+  .patch(isAdmin, uploadBannerImage, resizeBannerImage, editBanner);
 
 router.patch("/banner/action/:id", isAdmin, bannerAction);
 

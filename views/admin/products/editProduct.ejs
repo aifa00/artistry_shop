@@ -110,14 +110,14 @@
                     <!-- previous product images -->
                     <div class="d-flex flex-wrap">
 
-                      <!-- product image 3 -->
+                      <!-- product image 1 -->
                       <div class="col-md-2 me-2">
                         <div class="card text-center" id="previewImage">
                           <% if (foundProduct.images[0]) { %>
 
                             <form action="/admin/product/delete-image/<%= foundProduct._id %>?_method=DELETE" method="post">
-                              <img src="<%= foundProduct.images[0] %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
-                              <input type="hidden" name="image" value="<%= foundProduct.images[0] %>">
+                              <img src="<%= foundProduct.images[0].url %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
+                              <input type="hidden" name="key" value="<%= foundProduct.images[0].key %>">
                               <button class="btn text-primary" style="font-size: 13px;font-weight: 600;" >Delete <i class="bi bi-trash"></i></button>
                             </form>
   
@@ -140,8 +140,8 @@
                           <% if (foundProduct.images[1]) { %>
 
                             <form action="/admin/product/delete-image/<%= foundProduct._id %>?_method=DELETE" method="post">
-                              <img src="<%= foundProduct.images[1] %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
-                              <input type="hidden" name="image" value="<%= foundProduct.images[1] %>">
+                              <img src="<%= foundProduct.images[1].url %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
+                              <input type="hidden" name="key" value="<%= foundProduct.images[1].key %>">
                               <button class="btn text-primary" style="font-size: 13px;font-weight: 600;" >Delete <i class="bi bi-trash"></i></button>
                             </form>
   
@@ -164,8 +164,8 @@
                           <% if (foundProduct.images[2]) { %>
 
                           <form action="/admin/product/delete-image/<%= foundProduct._id %>?_method=DELETE" method="post">
-                            <img src="<%= foundProduct.images[2] %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
-                            <input type="hidden" name="image" value="<%= foundProduct.images[2] %>">
+                            <img src="<%= foundProduct.images[2].url %>" alt="img" class="preview img-fluid" id="image" style="object-fit: cover; max-height: 150px; max-width: 150px;" />
+                            <input type="hidden" name="key" value="<%= foundProduct.images[2].key %>">
                             <button class="btn text-primary" style="font-size: 13px;font-weight: 600;">Delete <i class="bi bi-trash"></i></button>
                           </form>
 
@@ -213,8 +213,6 @@ const offerPercentage = document.getElementById('offerPercentage');
 const offerValidUpto = document.getElementById('offerValidUpto');
 
 form.addEventListener('submit', (event) => {
-
-
   // set has errors false by default
   let hasErrors = false;
 
@@ -234,20 +232,17 @@ form.addEventListener('submit', (event) => {
     if(!product.value) {
       hasErrors = true;
       document.getElementById("productError").innerHTML = "This field is required";
-    } else if (!product.value.match(/^[A-Za-z0-9\s]+$/)) {
+    }  else if(product.value.length > 100){
       hasErrors = true;
-      document.getElementById("productError").innerHTML = "Product name must not contain special characters";
-    } else if(product.value.length < 3 || product.value.length > 60){
-      hasErrors = true;
-      document.getElementById('productError').innerHTML = "Product name should be between three to sixty characters"
+      document.getElementById('productError').innerHTML = "Title cannot exceed 100 characters"
     }
 
     if (!description.value) {
       hasErrors = true;
       document.getElementById('descriptionError').innerHTML = "This field is required"
-    } else if (description.value.length < 5 || description.value.length > 200){
+    } else if (description.value.length > 400){
       hasErrors = true;
-      document.getElementById('descriptionError').innerHTML = "Description should be between five to two hundred cahracters";
+      document.getElementById('descriptionError').innerHTML = "Description cannot exceed 400 characters";
     } else if (product.value == description.value) {
       hasErrors = true;
       document.getElementById("descriptionError").innerHTML = "Product name and description can't be same";
@@ -256,7 +251,7 @@ form.addEventListener('submit', (event) => {
     if (!price.value) {
       hasErrors = true;
       document.getElementById("priceError").innerHTML = "This field is required";
-    }else if (!price.value.match(/^\d+$/) || parseInt(price.value) <= 0) {
+    } else if (!price.value.match(/^\d+$/) || parseInt(price.value) <= 0) {
       hasErrors = true;
       document.getElementById("priceError").innerHTML = "Please enter a valid price";
     }
@@ -264,12 +259,9 @@ form.addEventListener('submit', (event) => {
     if (!artist.value) {
       hasErrors = true;
       document.getElementById("artistError").innerHTML = "This field is required";
-    } else if (!artist.value.match(/^[A-Za-z\s]+$/)) {
+    } else if (artist.value.length > 50){
       hasErrors = true;
-      document.getElementById("artistError").innerHTML = "Enter a valid artist name";
-    } else if (artist.value.length < 3 || artist.value.length > 20){
-      hasErrors = true;
-      document.getElementById('artistError').innerHTML = "Artist name should be between three to twenty characters"
+      document.getElementById('artistError').innerHTML = "Artist name cannot exceed 50 characters";
     }
     
     if(!stock.value) {

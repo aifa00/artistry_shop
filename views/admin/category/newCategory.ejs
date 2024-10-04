@@ -117,7 +117,7 @@
           document.getElementById("offerPercentageError").innerHTML = "Offer Percentage is required";
         }
     
-        if ( parseInt(offerPercentage.value) < 1 || parseInt(offerPercentage.value) > 100) {
+        if (parseInt(offerPercentage.value) < 1 || parseInt(offerPercentage.value) > 100) {
           hasErrors = true;
           document.getElementById("offerPercentageError").innerHTML = "Percentage should be between 1 - 100%";
         } else if (offerPercentage.value && !offerPercentage.value.match(/^\d+$/)) {

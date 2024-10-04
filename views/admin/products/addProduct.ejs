@@ -161,21 +161,18 @@ form.addEventListener('submit', (event) => {
     if(!product.value) {
       hasErrors = true;
       document.getElementById("productError").innerHTML = "This field is required";
-    } else if (!product.value.match(/^[A-Za-z0-9\s]+$/)) {
+    } else if(product.value.length > 100) {
       hasErrors = true;
-      document.getElementById("productError").innerHTML = "Product name must not contain special characters";
-    } else if(product.value.length < 3 || product.value.length > 60){
-      hasErrors = true;
-      document.getElementById('productError').innerHTML = "Product name should be between three to sixty characters"
+      document.getElementById('productError').innerHTML = "Title cannot exceed 100 characters"
     }
 
     if (!description.value) {
       hasErrors = true;
       document.getElementById('descriptionError').innerHTML = "This field is required"
-    } else if (description.value.length < 5 || description.value.length > 200){
+    } else if (description.value.length > 400) {
       hasErrors = true;
-      document.getElementById('descriptionError').innerHTML = "Description should be between five to two hundred cahracters";
-    } else if (product.value == description.value) {
+      document.getElementById('descriptionError').innerHTML = "Description cannot exceed 400 characters";
+    } else if (product.value === description.value) {
       hasErrors = true;
       document.getElementById("descriptionError").innerHTML = "Product name and description can't be same";
     }
@@ -183,7 +180,7 @@ form.addEventListener('submit', (event) => {
     if (!price.value) {
       hasErrors = true;
       document.getElementById("priceError").innerHTML = "This field is required";
-    }else if (!price.value.match(/^\d+$/) || parseInt(price.value) <= 0) {
+    } else if (!price.value.match(/^\d+$/) || parseInt(price.value) <= 0) {
       hasErrors = true;
       document.getElementById("priceError").innerHTML = "Please enter a valid price";
     }
@@ -191,12 +188,9 @@ form.addEventListener('submit', (event) => {
     if (!artist.value) {
       hasErrors = true;
       document.getElementById("artistError").innerHTML = "This field is required";
-    } else if (!artist.value.match(/^[A-Za-z\s]+$/)) {
+    } else if (artist.value.length > 50){
       hasErrors = true;
-      document.getElementById("artistError").innerHTML = "Enter a valid artist name";
-    } else if (artist.value.length < 3 || artist.value.length > 20){
-      hasErrors = true;
-      document.getElementById('artistError').innerHTML = "Artist name should be between three to twenty characters"
+      document.getElementById('artistError').innerHTML = "Artist name cannot exceed 50 characters"
     }
     
     if(!stock.value) {
@@ -219,7 +213,6 @@ form.addEventListener('submit', (event) => {
     if (!fileInput.value) {
       hasErrors = true;
       document.getElementById("imageInputError").innerHTML = "This field is required";
-      
     }
 
     if (offerPercentage.value && !offerValidUpto.value) {
@@ -254,27 +247,22 @@ form.addEventListener('submit', (event) => {
 });
 
     
+//image upload     
+fileInput.addEventListener('change', function(event) {
+  if (fileInput.files.length > 3) {
+    hasErrors = true;
+    fileInput.value = ''; 
+    document.getElementById("imageInputError").innerHTML = "You can only select up to three images.";
+  } else if (fileInput.files.length < 3) {
+    hasErrors = true;
+    fileInput.value = ''; 
+    document.getElementById("imageInputError").innerHTML = "Please upload atleast three product images";
+  } else if (fileInput.files.length === 3) {
+    document.getElementById("imageInputError").innerHTML = "";
+    
+  }
 
-            //image upload 
-             
-
-            fileInput.addEventListener('change', function(event) {
-
-              if (fileInput.files.length > 3) {
-                hasErrors = true;
-                fileInput.value = ''; 
-                document.getElementById("imageInputError").innerHTML = "You can only select up to three images.";
-              } else if (fileInput.files.length < 3) {
-                hasErrors = true;
-                fileInput.value = ''; 
-                document.getElementById("imageInputError").innerHTML = "Please upload atleast three product images";
-              } else if (fileInput.files.length === 3) {
-                document.getElementById("imageInputError").innerHTML = "";
-                
-              }
-                       
-
-            });
+});
             
     </script>
 

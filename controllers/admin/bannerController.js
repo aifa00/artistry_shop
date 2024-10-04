@@ -1,12 +1,11 @@
-import fs from "fs";
-import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import Banner from "../../models/bannerModel.js";
-import logger from "../../utils/logger.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import {
+  deleteFileFromS3,
+  getPreSignedUrl,
+  uploadFileToS3,
+} from "../../utils/s3Utils.js";
 
 //get add new banner
 export const getAddNewBanner = async (req, res, next) => {
@@ -23,17 +22,19 @@ export const getAddNewBanner = async (req, res, next) => {
 //post add new banner
 export const addNewBanner = async (req, res, next) => {
   try {
-    const { title, description, type, url, images } = req.body;
+    const { title, description, type, url } = req.body;
+    const image = req.file;
 
-    if (title && description && type && images) {
-      const imagesWithPath = images.map((image) => "/banners/" + image);
+    if (title && description && type && image) {
+      const folder = "banners";
+      const imageKey = await uploadFileToS3(image, folder);
 
       await Banner.create({
         title,
         description,
         type,
         url,
-        images: imagesWithPath,
+        image: imageKey,
       });
 
       res.redirect("/admin/banners/1");
@@ -58,7 +59,19 @@ export const getBanners = async (req, res, next) => {
     const totalBanners = await Banner.countDocuments();
     const totalPages = Math.ceil(totalBanners / pageSize) || 1;
 
-    const foundBanners = await Banner.find().skip(skip).limit(pageSize);
+    let foundBanners = await Banner.find().skip(skip).limit(pageSize);
+
+    foundBanners = await Promise.all(
+      foundBanners.map(async (banner) => {
+        const imageUrl = banner.image
+          ? await getPreSignedUrl(banner.image)
+          : "";
+        return {
+          ...banner.toObject(),
+          image: imageUrl,
+        };
+      })
+    );
 
     res.render("admin/banner/banners", {
       foundBanners,
@@ -74,7 +87,18 @@ export const getBanners = async (req, res, next) => {
 //get edit banner
 export const getEditBanner = async (req, res, next) => {
   try {
-    const foundBanner = await Banner.findById(req.params.id);
+    let foundBanner = await Banner.findById(req.params.id);
+
+    const imageUrl = foundBanner.image
+      ? await getPreSignedUrl(foundBanner.image)
+      : "";
+
+    if (imageUrl) {
+      foundBanner = {
+        ...foundBanner.toObject(),
+        image: imageUrl,
+      };
+    }
 
     res.render("admin/banner/editBanner", {
       foundBanner,
@@ -88,21 +112,29 @@ export const getEditBanner = async (req, res, next) => {
 
 //post edit banner
 export const editBanner = async (req, res, next) => {
-  const foundBanner = await Banner.findById(req.params.id);
   try {
     const { title, description, type, url } = req.body;
+    const image = req.file;
+
+    const foundBanner = await Banner.findById(req.params.id);
 
     if (title && description && type) {
-      const dataToUpdate = {
-        title,
-        description,
-        type,
-        url,
-      };
+      foundBanner.title = title;
+      foundBanner.description = description;
+      foundBanner.type = type;
+      foundBanner.url = url;
 
-      await Banner.findByIdAndUpdate(req.params.id, dataToUpdate, {
-        runValidators: true,
-      });
+      if (image) {
+        if (foundBanner.image) {
+          await deleteFileFromS3(foundBanner.image);
+        }
+
+        const folder = "banners";
+        const newImageKey = await uploadFileToS3(image, folder);
+        foundBanner.image = newImageKey;
+      }
+
+      await foundBanner.save();
 
       res.redirect("/admin/banners/1");
     } else {
@@ -111,53 +143,6 @@ export const editBanner = async (req, res, next) => {
         error: "All fields are required.",
         activePage: "Banner",
       });
-    }
-  } catch (error) {
-    next(error);
-  }
-};
-
-//delete a banner image
-export const deleteBannerImage = async (req, res, next) => {
-  try {
-    const { image } = req.body;
-
-    await Banner.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { images: image } },
-      { new: true }
-    );
-
-    fs.unlink(path.join(__dirname, "../../public", image), (error) => {
-      if (error) {
-        logger.log({
-          level: "error",
-          message: error,
-        });
-      }
-    });
-
-    res.redirect(`/admin/edit-banner/${req.params.id}`);
-  } catch (error) {
-    next(error);
-  }
-};
-
-//add a banner image
-export const addBannerImage = async (req, res, next) => {
-  try {
-    const { images } = req.body;
-
-    const newBannerImage = "/banners/" + images;
-
-    if (typeof images !== "undefined") {
-      await Banner.findByIdAndUpdate(
-        req.params.id,
-        { $push: { images: newBannerImage } },
-        { new: true }
-      );
-
-      res.redirect(`/admin/edit-banner/${req.params.id}`);
     }
   } catch (error) {
     next(error);

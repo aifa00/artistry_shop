@@ -36,12 +36,12 @@
                                         <% if(currentUser.profile) { %>
 
                                             <form id="removeImageForm" action="/profile/remove-profile-image" method="post">
-                                                <img class="rounded-circle mt-4" width="150px" src="<%= currentUser.profile %>">
+                                                <img class="rounded-circle mt-4" src="<%= currentUser.profile %>" style="height: 150px; width: 150px;" >
                                                 <button type="button" class="btn btn-outline-primary mt-1" data-toggle="modal" data-target="#removeImageModal">Remove Image</button>
                                             </form>
                                             
                                         <% } else { %>
-                                            <img class="rounded-circle mt-4" width="150px" src="https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg">
+                                            <img class="rounded-circle mt-4" style="height: 150px; width: 150px;" src="https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg">
                                             
                                         <% } %>
                                             <span class="font-weight-bold"><%= currentUser.name %></span>

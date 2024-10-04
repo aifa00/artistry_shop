@@ -14,9 +14,8 @@ const bannerSchema = mongoose.Schema({
     enum: ["hero-banner", "featured-banner"],
     required: true,
   },
-  images: {
-    type: [String],
-    required: true,
+  image: {
+    type: String,
   },
   url: {
     type: String,

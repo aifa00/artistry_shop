@@ -18,21 +18,19 @@
             <% if (heroBanners[0]) { %>
             <div
               class="intro-slide"
-              style="background-image: url('<%= heroBanners[0].images[0] %>')"
+              style="background-image: url('<%= heroBanners[0].image %>')"
             >
               <div
                 class="container intro-content text-center"
                 style="margin-top: 22rem"
               >
-                <h3 class="intro-subtitle text-white">
-                  <%= heroBanners[0].description %>
-                </h3>
-                <!-- End .h3 intro-subtitle -->
                 <h1 class="intro-title text-white">
                   <%= heroBanners[0].title %>
                 </h1>
                 <!-- End .intro-title -->
-                <div class="intro-text text-white">Online Only</div>
+                <div class="intro-text text-white">
+                  <%= heroBanners[0].description %>
+                </div>
                 <!-- End .intro-text -->
                 <a href="<%= heroBanners[0].url %>" class="btn btn-primary"
                   >Discover NOW</a
@@ -44,7 +42,7 @@
             <% } %> <% if (heroBanners[1]) { %>
             <div
               class="intro-slide"
-              style="background-image: url('<%= heroBanners[1].images[0] %>')"
+              style="background-image: url('<%= heroBanners[1].image %>')"
             >
               <div
                 class="container intro-content text-center"
@@ -101,10 +99,7 @@
               <div class="col-md-6">
                 <div class="banner banner-border-hover">
                   <a href="<%= featuredBanners[0].url %>">
-                    <img
-                      src="<%= featuredBanners[0].images[0] %>"
-                      alt="Banner"
-                    />
+                    <img src="<%= featuredBanners[0].image %>" alt="Banner" />
                   </a>
 
                   <div class="banner-content">
@@ -128,10 +123,7 @@
               <div class="col-md-6">
                 <div class="banner banner-border-hover">
                   <a href="<%= featuredBanners[1].url %>">
-                    <img
-                      src="<%= featuredBanners[1].images[0] %>"
-                      alt="Banner"
-                    />
+                    <img src="<%= featuredBanners[1].image %>" alt="Banner" />
                   </a>
 
                   <div class="banner-content">
@@ -312,7 +304,7 @@
                   <div class="product-body">
                     <div class="product-cat">
                       <a href="/product/<%= product._id %>"
-                        ><%= product.category.name %></a
+                        ><%= product.category?.name %></a
                       >
                     </div>
                     <!-- End .product-cat -->
@@ -463,7 +455,7 @@
 
                   <div class="product-body">
                     <div class="product-cat">
-                      <a href="#"><%= product.category.name %></a>
+                      <a href="#"><%= product.category?.name %></a>
                     </div>
                     <!-- End .product-cat -->
                     <h3 class="product-title">
@@ -612,7 +604,7 @@
 
                   <div class="product-body">
                     <div class="product-cat">
-                      <a href="#"><%= product.category.name %></a>
+                      <a href="#"><%= product.category?.name %></a>
                     </div>
                     <!-- End .product-cat -->
                     <h3 class="product-title">
@@ -776,7 +768,7 @@
 
                       <div class="product-body">
                         <div class="product-cat">
-                          <a href="#"><%= product.category.name %></a>
+                          <a href="#"><%= product.category?.name %></a>
                         </div>
                         <!-- End .product-cat -->
                         <h3 class="product-title">

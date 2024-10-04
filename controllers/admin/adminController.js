@@ -6,6 +6,7 @@ import Return from "../../models/returnModel.js";
 import PDFDocument from "pdfkit";
 import ExcelJS from "exceljs";
 import logger from "../../utils/logger.js";
+import { getPreSignedUrl } from "../../utils/s3Utils.js";
 
 export const getDashboard = async (req, res, next) => {
   try {
@@ -119,7 +120,6 @@ export const getDashboard = async (req, res, next) => {
       : 0;
 
     //chart datas
-    //by default(filtered is false) date set to this year
     let startDate = new Date(currentDate.getFullYear(), 0, 1, 0, 0, 0);
     let endDate = new Date(currentDate.getFullYear(), 11, 31, 23, 59, 59);
 
@@ -298,13 +298,12 @@ export const getOrders = async (req, res, next) => {
     const orders = await Order.aggregate([
       { $match: {} },
       { $unwind: "$products" },
-      // creating a separate document for each product in an order.
       {
         $lookup: {
-          from: "products", //  search for matching documents in the "Product" collection.
-          localField: "products.product", // contains the value to match against the foreign collection
-          foreignField: "_id", // field from the foreign collection ("products" collection) that the localField will match against.
-          as: "orderedProducts", // an array containing documents from the "products" collection that satisfy the lookup conditions
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "orderedProducts",
         },
       },
       { $sort: { orderDate: -1 } },
@@ -370,8 +369,46 @@ export const getSingleOrder = async (req, res, next) => {
       (element) => element.product._id.toString() !== req.params.productId
     );
 
+    let imageUrls = foundOrder[0]?.populatedProduct[0]?.images;
+
+    if (imageUrls && imageUrls.length > 0) {
+      imageUrls = await Promise.all(
+        imageUrls.map(async (key) => {
+          const url = await getPreSignedUrl(key);
+          return url;
+        })
+      );
+    }
+
+    let profileUrl = foundOrder[0]?.populatedUser[0]?.profile;
+
+    if (profileUrl) {
+      profileUrl = await getPreSignedUrl(profileUrl);
+    }
+
+    const updatedOrder = {
+      ...foundOrder[0],
+      populatedProduct: [
+        {
+          title: foundOrder[0].populatedProduct[0].title,
+          images: imageUrls,
+          price: foundOrder[0].populatedProduct[0].price,
+          stock: foundOrder[0].populatedProduct[0].stock,
+        },
+      ],
+      populatedUser: [
+        {
+          name: foundOrder[0].populatedUser[0].name,
+          email: foundOrder[0].populatedUser[0].email,
+          phone: foundOrder[0].populatedUser[0].phone,
+          blocked: foundOrder[0].populatedUser[0].blocked,
+          profile: profileUrl || "",
+        },
+      ],
+    };
+
     res.render("admin/viewSingleOrder", {
-      foundOrder,
+      foundOrder: [updatedOrder],
       otherProducts,
       appliedCoupon,
       activePage: "Orders",

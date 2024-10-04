@@ -12,28 +12,90 @@ import User from "../../models/userModel.js";
 import Banner from "../../models/bannerModel.js";
 import Return from "../../models/returnModel.js";
 import logger from "../../utils/logger.js";
+import { getPreSignedUrl } from "../../utils/s3Utils.js";
 
 //get home
 export const getHome = async (req, res, next) => {
   try {
-    const allProducts = await Product.find({ softDeleted: false }).populate(
-      "category"
-    );
-    const canvas = allProducts.filter(
-      (product) => product.category.name === "Canvas"
-    );
-    const paintings = allProducts.filter(
-      (product) => product.category.name === "Paintings"
-    );
+    let allProducts = await Product.find({ softDeleted: false })
+      .populate("category")
+      .limit(10);
+
+    if (allProducts) {
+      allProducts = await Promise.all(
+        allProducts.map(async (product) => {
+          const imageUrls = await Promise.all(
+            product.images.map(async (img) => {
+              const url = await getPreSignedUrl(img);
+              return url;
+            })
+          );
+          return {
+            _id: product._id,
+            title: product.title,
+            stock: product.stock,
+            price: product.price,
+            category: {
+              name: product.category.name,
+              isOfferActive: product.category.isOfferActive,
+              offerValidUpto: product.category.offerValidUpto,
+              offerPercentage: product.category.offerPercentage,
+            },
+            images: imageUrls,
+            isOfferActive: product.isOfferActive,
+            offerValidUpto: product.offerValidUpto,
+            offerPercentage: product.offerPercentage,
+          };
+        })
+      );
+    }
+
+    let canvas;
+    let paintings;
+
+    if (allProducts.length > 0) {
+      canvas = allProducts.filter(
+        (product) => product.category.name === "Canvas"
+      );
+      paintings = allProducts.filter(
+        (product) => product.category.name === "Paintings"
+      );
+    }
     const foundCategories = await Category.find({ disabled: false }).limit(5);
-    const heroBanners = await Banner.find({
+
+    let heroBanners = await Banner.find({
       type: "hero-banner",
       isActive: true,
     }).limit(2);
-    const featuredBanners = await Banner.find({
+
+    if (heroBanners.length > 0) {
+      heroBanners = await Promise.all(
+        heroBanners.map(async (banner) => {
+          const url = await getPreSignedUrl(banner.image);
+          return {
+            ...banner.toObject(),
+            image: url,
+          };
+        })
+      );
+    }
+
+    let featuredBanners = await Banner.find({
       type: "featured-banner",
       isActive: true,
     }).limit(2);
+
+    if (featuredBanners.length > 0) {
+      featuredBanners = await Promise.all(
+        featuredBanners.map(async (banner) => {
+          const url = await getPreSignedUrl(banner.image);
+          return {
+            ...banner.toObject(),
+            image: url,
+          };
+        })
+      );
+    }
 
     res.render("user/home", {
       isLoggedIn: isLoggedIn(req, res),
@@ -59,7 +121,6 @@ export const getShop = async (req, res, next) => {
     const pageSize = 6;
     const skip = (page - 1) * pageSize;
     let totalProducts = await Product.countDocuments({ softDeleted: false });
-    // let totalProducts ;
 
     const categories = req.query.categories;
     const colors = req.query.colors;
@@ -172,6 +233,32 @@ export const getShop = async (req, res, next) => {
       }
     }
 
+    if (foundProducts) {
+      foundProducts = await Promise.all(
+        foundProducts.map(async (product) => {
+          const imageUrl = await getPreSignedUrl(product.images[0]);
+
+          return {
+            _id: product._id,
+            title: product.title,
+            stock: product.stock,
+            price: product.price,
+            category: {
+              name: product.category.name,
+              isOfferActive: product.category.isOfferActive,
+              offerValidUpto: product.category.offerValidUpto,
+              offerPercentage: product.category.offerPercentage,
+              disabled: product.category.disabled,
+            },
+            images: [imageUrl],
+            isOfferActive: product.isOfferActive,
+            offerValidUpto: product?.offerValidUpto,
+            offerPercentage: product.offerPercentage,
+          };
+        })
+      );
+    }
+
     const totalPages = Math.ceil(totalProducts / pageSize);
 
     const foundCategories = await Category.find({ disabled: false });
@@ -225,7 +312,38 @@ export const getWishlist = async (req, res, next) => {
       await currentUser.populate("wishlist");
       await currentUser.populate("wishlist.category");
 
-      const foundProducts = currentUser.wishlist;
+      let foundProducts = currentUser?.wishlist;
+
+      if (foundProducts) {
+        foundProducts = await Promise.all(
+          foundProducts.map(async (product) => {
+            const imageUrls = await Promise.all(
+              product.images.map(async (img) => {
+                const url = await getPreSignedUrl(img);
+                return url;
+              })
+            );
+
+            return {
+              _id: product._id,
+              title: product.title,
+              stock: product.stock,
+              price: product.price,
+              category: {
+                name: product.category.name,
+                isOfferActive: product.category.isOfferActive,
+                offerValidUpto: product.category.offerValidUpto,
+                offerPercentage: product.category.offerPercentage,
+                disabled: product.category.disabled,
+              },
+              images: imageUrls,
+              isOfferActive: product.isOfferActive,
+              offerValidUpto: product?.offerValidUpto,
+              offerPercentage: product.offerPercentage,
+            };
+          })
+        );
+      }
 
       res.render("user/wishlist", {
         isLoggedIn: isLoggedIn(req, res),
@@ -267,9 +385,23 @@ export const removeFromWishlist = async (req, res, next) => {
 //get single product
 export const getProduct = async (req, res, next) => {
   try {
-    const foundProduct = await Product.findById(req.params.id).populate(
+    let foundProduct = await Product.findById(req.params.id).populate(
       "category"
     );
+
+    if (foundProduct) {
+      const imageUrls = await Promise.all(
+        foundProduct.images.map(async (img) => {
+          const url = await getPreSignedUrl(img);
+          return url;
+        })
+      );
+
+      foundProduct = {
+        ...foundProduct.toObject(),
+        images: imageUrls,
+      };
+    }
 
     res.render("user/singleProduct", {
       isLoggedIn: isLoggedIn(req, res),

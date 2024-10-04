@@ -13,8 +13,10 @@
                 <div class="row g-4 p-4">
 
                     <div class="col-12">
-                        <h5 class="mb-2 ms-2 text-dark">ALL CATEGORIES</h5>                   
-                        <div class="rounded h-100 p-4" style="background-color: #eeee;">
+                        <h5 class="mb-2 ms-2 text-dark d-inline-block">ALL CATEGORIES</h5> &nbsp;
+                        <a href="/admin/new-category" class="btn-primary rounded p-2" style="display: inline-block; cursor: pointer;">Add +</a>              
+
+                        <div class="rounded h-100 p-4 mt-2" style="background-color: #eeee;">
                             
                             <div class="table-responsive">
                                 <table class="table">
@@ -88,10 +90,10 @@
 
                                                                 <% if(category.disabled===true ) { %>
                                                                     <input type="hidden" value="" name="state" >
-                                                                    <button type="submit" class="btn btn-sm action-btn me-2" style="width: 65px;background-color: rgb(38, 141, 38); color: white;">Activate</button>
+                                                                    <button type="submit" class="btn btn-sm action-btn me-2" style="width: 65px;background-color: rgb(38, 141, 38); color: white;">Enable</button>
                                                                 <% } else { %>
                                                                     <input type="hidden" value="1" name="state" >
-                                                                    <button type="submit" class="btn btn-sm btn-primary action-btn me-2">Delete</button>
+                                                                    <button type="submit" class="btn btn-sm btn-primary action-btn me-2">Disable</button>
                                                                 <% } %>
                                 
                                                             </form>
@@ -100,11 +102,11 @@
 
                                                                 <% if (category.isOfferActive && currentDate <= category.offerValidUpto) { %>
                                                                     <input type="hidden" value="" name="state" >
-                                                                    <button type="submit" class="btn btn-sm action-btn"  style="background-color: #137fb1ee;color: white;">Diactivate Off</button>
+                                                                    <button type="submit" class="btn btn-sm action-btn"  style="background-color: #137fb1ee;color: white;">Diactivate Offer</button>
                                                                 <% } else { %>
                                                                     <input type="hidden" value="1" name="state">
                                                                     <button type="submit" class="btn btn-sm action-btn px-3" style="background-color: rgb(219, 189, 0); color: white;">
-                                                                        Activate Off
+                                                                        Activate Offer
                                                                     </button>
                                                                 <% } %> 
 
